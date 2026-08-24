@@ -41,46 +41,88 @@ export function Home() {
       jsonLd={jsonLd}
     >
       <section class="hero">
-        <p class="eyebrow">Open source · MIT · nothing leaves your device</p>
-        <h1>
-          Check the device
-          <br />
-          in front of you.
-        </h1>
-        <p class="hero-sub">
-          {TESTS.length} hardware tests that run entirely in your browser. No account, no upload, no trial.
-          Install it as an app, or run the desktop build on Windows, macOS and Linux.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary btn-lg" href="/microphone">
-            Test my microphone
-          </a>
-          <a class="btn btn-secondary btn-lg" href="#tests">
-            Browse all tests
-          </a>
+        <div class="hero-copy">
+          <p class="eyebrow">{TESTS.length} instruments · MIT · offline</p>
+          <h1>
+            Find the fault
+            <br />
+            before the call does.
+          </h1>
+          <p class="hero-sub">
+            {TESTS.length} hardware instruments that run inside the page — microphone, camera, screen share,
+            keyboard, sensors, network. Nothing is uploaded, nothing is kept, and the source is on the bench
+            for you to read.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="/microphone">
+              Run the mic test
+            </a>
+            <a class="btn btn-secondary btn-lg" href="#tests">
+              All {TESTS.length} instruments
+            </a>
+          </div>
         </div>
-        <dl class="hero-stats">
-          <div>
-            <dt>Tests</dt>
-            <dd>{TESTS.length}</dd>
+
+        {/* The hero image is a reading, not an illustration. */}
+        <div class="scope" aria-hidden="true">
+          <div class="scope-head">
+            <span>INPUT — MICROPHONE</span>
+            <span class="scope-live">LIVE</span>
           </div>
-          <div>
-            <dt>Accounts required</dt>
-            <dd>0</dd>
+          <div class="scope-screen">
+            <svg viewBox="0 0 560 236" preserveAspectRatio="none" role="presentation">
+              <path
+                d="M0 118 L28 118 L40 74 L52 162 L64 96 L76 140 L88 60 L100 176 L112 108 L124 128 L140 118 L164 118 L176 88 L188 150 L200 70 L212 166 L224 104 L236 132 L252 118 L280 118 L292 82 L304 158 L316 66 L328 172 L340 100 L352 136 L368 118 L396 118 L408 92 L420 146 L432 78 L444 160 L456 112 L468 124 L484 118 L560 118"
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
-          <div>
-            <dt>Data uploaded</dt>
-            <dd>None</dd>
+          <div class="scope-foot">
+            <div>
+              <div class="stat-label">Peak</div>
+              <div class="stat-value">−6.2 dBFS</div>
+            </div>
+            <div>
+              <div class="stat-label">Rate</div>
+              <div class="stat-value">48 000 Hz</div>
+            </div>
+            <div>
+              <div class="stat-label">Channels</div>
+              <div class="stat-value">1 mono</div>
+            </div>
           </div>
-          <div>
-            <dt>Works offline</dt>
-            <dd>Yes</dd>
-          </div>
-        </dl>
+        </div>
       </section>
 
+      <dl class="hero-stats">
+        <div>
+          <dt>Instruments</dt>
+          <dd>{TESTS.length}</dd>
+        </div>
+        <div>
+          <dt>Bytes uploaded</dt>
+          <dd>0</dd>
+        </div>
+        <div>
+          <dt>Accounts</dt>
+          <dd>None</dd>
+        </div>
+        <div>
+          <dt>Works offline</dt>
+          <dd>Yes</dd>
+        </div>
+      </dl>
+
       <section class="section" id="tests">
-        <h2>Every test</h2>
+        <div class="section-head">
+          <h2>The rack</h2>
+          <span class="section-count">
+            {TESTS.length} / {TESTS.length} AVAILABLE
+          </span>
+        </div>
         {GROUPS.map((group) => (
           <div class="group">
             <h3 class="group-title">{group.name}</h3>

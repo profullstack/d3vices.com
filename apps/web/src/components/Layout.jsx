@@ -30,7 +30,13 @@ export function Layout({ title, description, path = '/', jsonLd, wide = false, c
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" href="/static/img/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/static/img/icon-192.png" />
-        <meta name="theme-color" content="#0b0f14" />
+        <meta name="theme-color" content="#08090c" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        />
         <link rel="stylesheet" href={`/static/css/style.css?v=${ASSET_VERSION}`} />
         {/* Set the theme before first paint so a stored light theme never flashes dark. */}
         <script
@@ -69,7 +75,21 @@ function Header() {
     <header class="header">
       <div class="header-inner">
         <a class="brand" href="/">
-          <span class="brand-mark">d3</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M2 12h4l2.5-6 4 12 3-8 2 2H22" />
+            </svg>
+          </span>
           <span class="brand-name">d3vices</span>
         </a>
         <button
@@ -118,7 +138,21 @@ function Footer() {
     <footer class="footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <span class="brand-mark">d3</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M2 12h4l2.5-6 4 12 3-8 2 2H22" />
+            </svg>
+          </span>
           <p>
             Every test runs on your device. Nothing you test is uploaded, and there is no account to make.
           </p>
@@ -149,7 +183,7 @@ function Footer() {
       </div>
       <div class="footer-bottom">
         <span>© {new Date().getFullYear()} Profullstack, Inc.</span>
-        <span>{TESTS.length} tests · no sign-up · no tracking</span>
+        <span>{TESTS.length} INSTRUMENTS · NO SIGN-UP · NO TRACKING</span>
       </div>
     </footer>
   );
