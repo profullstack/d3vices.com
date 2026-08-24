@@ -1,0 +1,23 @@
+{
+  "name": "@d3vices/desktop",
+  "productName": "d3vices",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source hardware diagnostics for Windows, macOS and Linux.",
+  "license": "MIT",
+  "author": "Profullstack, Inc. <hello@profullstack.com>",
+  "homepage": "https://d3vices.com",
+  "main": "src/main.js",
+  "scripts": {
+    "prepare:app": "bun prepare.js",
+    "start": "bun prepare.js && electron .",
+    "dist": "bun prepare.js && electron-builder --publish never",
+    "dist:linux": "bun prepare.js && electron-builder --linux --publish never",
+    "dist:win": "bun prepare.js && electron-builder --win --publish never",
+    "dist:mac": "bun prepare.js && electron-builder --mac --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

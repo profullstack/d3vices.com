@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+
+# Build output
+dist/
+release/
+out/
+apps/web/public/static/js/app.js
+apps/web/public/static/js/app.js.map
+
+# Staged into the desktop package by apps/desktop/prepare.js
+apps/desktop/site/
+apps/desktop/src/registry.mjs
+apps/desktop/build/icon.png

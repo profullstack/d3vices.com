@@ -1,0 +1,12 @@
+{
+  "name": "@d3vices/tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./registry": "./src/registry.js"
+  }
+}

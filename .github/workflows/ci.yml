@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      # Electron's postinstall downloads a ~100MB binary that nothing in this
+      # job needs; the desktop job installs it properly.
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run build:client
+      - run: bun run --bun biome check .
+      - run: bun test
+      - name: Export the static site
+        run: bun apps/web/src/export.js
+
+  browser:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run build:client
+      - name: Every test must mount in a real browser
+        run: bun test/browser-smoke.js

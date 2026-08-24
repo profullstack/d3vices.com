@@ -1,0 +1,9 @@
+node_modules
+.git
+.github
+release
+out
+dist
+*.md
+!README.md
+.env*

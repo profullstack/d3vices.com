@@ -1,0 +1,13 @@
+{
+  "name": "@d3vices/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "main": "src/main.js",
+  "dependencies": {
+    "@d3vices/config": "workspace:*",
+    "@d3vices/tests": "workspace:*",
+    "hono": "^4.9.0"
+  }
+}

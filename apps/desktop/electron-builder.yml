@@ -1,0 +1,89 @@
+appId: com.profullstack.d3vices
+productName: d3vices
+copyright: Copyright © 2026 Profullstack, Inc.
+
+directories:
+  output: ../../release
+  buildResources: build
+
+# Only what the app actually runs. `site` is the exported website; `src` is the
+# main process. Nothing else needs to ship.
+files:
+  - src/**/*
+  - site/**/*
+  - package.json
+
+electronLanguages: [en-US]
+
+win:
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+    - target: portable
+      arch: [x64]
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: d3vices
+
+mac:
+  category: public.app-category.utilities
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  artifactName: ${productName}-${version}-${arch}.${ext}
+  # macOS refuses camera and microphone access outright to an app whose bundle
+  # does not declare why it wants them — the request never reaches the user.
+  extendInfo:
+    NSCameraUsageDescription: d3vices needs the camera to run the camera test. Nothing is recorded or uploaded.
+    NSMicrophoneUsageDescription: d3vices needs the microphone to run the microphone test. Nothing is recorded or uploaded.
+    NSLocationWhenInUseUsageDescription: d3vices needs your location only to run the location test.
+    NSBluetoothAlwaysUsageDescription: d3vices needs Bluetooth to run the Bluetooth test.
+  hardenedRuntime: true
+  entitlements: resources/entitlements.mac.plist
+  entitlementsInherit: resources/entitlements.mac.plist
+  gatekeeperAssess: false
+
+dmg:
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+linux:
+  category: Utility
+  synopsis: Open-source hardware diagnostics
+  description: Test your microphone, camera, screen, keyboard, sensors and network. Everything runs on your device.
+  target:
+    - target: deb
+      arch: [x64, arm64]
+    - target: AppImage
+      arch: [x64]
+  desktop:
+    entry:
+      Name: d3vices
+      Comment: Hardware diagnostics that run on your device
+      Categories: Utility;System;
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+deb:
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+    - libsecret-1-0
+  # These REPLACE electron-builder's own templates rather than extending them,
+  # so the symlink and mime/desktop-database updates have to be repeated there.
+  afterInstall: resources/after-install.sh
+  afterRemove: resources/after-remove.sh
+
+publish:
+  provider: github
+  owner: profullstack
+  repo: d3vices.com
