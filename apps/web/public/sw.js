@@ -14,6 +14,7 @@ const PRECACHE = [
   '/about',
   '/privacy',
   '/download',
+  '/machine',
   '/static/css/style.css',
   '/static/js/app.js',
   '/static/img/icon.svg',

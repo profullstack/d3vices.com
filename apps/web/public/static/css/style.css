@@ -1039,7 +1039,6 @@ a:hover {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
   gap: 1px;
-  align-items: start;
   margin-bottom: 1rem;
 }
 .stat {
@@ -1901,4 +1900,219 @@ a:hover {
 .card-static .btn {
   margin-top: 0.9rem;
   align-self: flex-start;
+}
+
+/* ------------------------------------------------------- machine / desktop */
+
+.machine-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.machine-cols h3.rack-group {
+  padding: 0 0 0.7rem;
+  font-size: 0.6rem;
+  font-weight: 500;
+}
+
+/* Displays drawn to relative scale: the one reading a browser tab cannot take. */
+.display-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  border: var(--rule);
+  background: var(--paper), var(--panel);
+  padding: 1.2rem;
+  margin-bottom: 0.7rem;
+  min-height: 150px;
+}
+
+.display-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border: 1.5px solid var(--line-strong);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  text-align: center;
+  min-width: 76px;
+  min-height: 48px;
+  padding: 0.3rem;
+}
+
+.display-box.is-primary {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+
+.disk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.disk-row {
+  background: var(--panel);
+  box-shadow: 0 0 0 1px var(--line);
+  padding: 0.7rem 0.85rem;
+}
+
+.disk-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.45rem;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+}
+
+.disk-mount {
+  color: var(--text);
+}
+.disk-free {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+.disk-bar {
+  height: 5px;
+  background: var(--grid);
+  overflow: hidden;
+}
+.disk-fill {
+  height: 100%;
+  background: var(--accent);
+}
+.disk-fill.is-full {
+  background: var(--danger);
+}
+
+/* The app shell. Present in every page's markup; only the desktop build shows it. */
+.app-body {
+  display: block;
+}
+.app-rack {
+  display: none;
+}
+.nav-desktop-only {
+  display: none;
+}
+
+.status-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 1rem;
+  border-top: var(--rule);
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+
+.status-bar[hidden] {
+  display: none;
+}
+.status-bar-note {
+  margin-left: auto;
+  color: var(--signal);
+}
+
+[data-desktop] .app-body {
+  display: grid;
+  grid-template-columns: 208px minmax(0, 1fr);
+  align-items: start;
+}
+
+[data-desktop] .app-rack {
+  display: block;
+  position: sticky;
+  top: 53px;
+  max-height: calc(100dvh - 53px);
+  overflow-y: auto;
+}
+
+[data-desktop] .nav-desktop-only {
+  display: inline-flex;
+}
+[data-desktop] .nav-web-only {
+  display: none;
+}
+[data-desktop] .footer {
+  display: none;
+}
+[data-desktop] .offline-banner {
+  display: none;
+}
+
+/* The per-page rack would double the app-level one. */
+[data-desktop] .test-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+[data-desktop] .test-layout > .rack-nav {
+  display: none;
+}
+
+[data-desktop] .header-inner {
+  padding: 0.55rem 1rem;
+}
+[data-desktop] .main {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 2.5rem;
+}
+[data-desktop] .test-page {
+  padding-left: 0;
+  padding-right: 0;
+}
+[data-desktop] .hero {
+  padding-top: 2.5rem;
+}
+
+/* An app window is narrower than a marketing page; keep the rack usable. */
+@media (max-width: 860px) {
+  [data-desktop] .app-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  [data-desktop] .app-rack {
+    display: none;
+  }
+  [data-desktop] .test-layout > .rack-nav {
+    display: block;
+  }
+  [data-desktop] .test-layout {
+    grid-template-columns: 232px minmax(0, 1fr);
+  }
+}
+
+[data-desktop] .nav-desktop-only {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: 0.86rem;
+}
+
+[data-desktop] .nav-desktop-only:hover {
+  color: var(--text);
+  border-color: var(--line);
+  text-decoration: none;
+}
+
+[data-desktop] .nav {
+  gap: 0.3rem;
 }

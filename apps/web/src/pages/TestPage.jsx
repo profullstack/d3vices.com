@@ -1,40 +1,7 @@
 import { config } from '@d3vices/config';
-import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
+import { TESTS, testsInGroup } from '@d3vices/tests/registry';
 import { Layout } from '../components/Layout.jsx';
-
-/**
- * Rack codes (A-01, C-04) are derived from the group order and the test's
- * position inside it, so adding a test never means hand-maintaining a label.
- */
-const GROUP_LETTER = Object.fromEntries(GROUPS.map((group, i) => [group.id, String.fromCharCode(65 + i)]));
-
-export function rackCode(test) {
-  const index = testsInGroup(test.group).findIndex((t) => t.id === test.id);
-  return `${GROUP_LETTER[test.group] ?? '?'}-${String(index + 1).padStart(2, '0')}`;
-}
-
-function RackNav({ current }) {
-  return (
-    <nav class="rack-nav" aria-label="All tests">
-      {GROUPS.map((group) => (
-        <div>
-          <div class="rack-group">
-            {GROUP_LETTER[group.id]} — {group.name.toUpperCase()}
-          </div>
-          {testsInGroup(group.id).map((test) => (
-            <a
-              class={test.id === current ? 'rack-link is-current' : 'rack-link'}
-              href={`/${test.slug}`}
-              aria-current={test.id === current ? 'page' : undefined}
-            >
-              {test.short}
-            </a>
-          ))}
-        </div>
-      ))}
-    </nav>
-  );
-}
+import { RackNav, rackCode } from '../components/RackNav.jsx';
 
 export function TestPage({ test }) {
   const path = `/${test.slug}`;
@@ -67,7 +34,14 @@ export function TestPage({ test }) {
   };
 
   return (
-    <Layout title={test.name} description={test.description} path={path} jsonLd={jsonLd} wide>
+    <Layout
+      title={test.name}
+      description={test.description}
+      path={path}
+      jsonLd={jsonLd}
+      wide
+      current={test.id}
+    >
       <div class="test-layout">
         <RackNav current={test.id} />
 

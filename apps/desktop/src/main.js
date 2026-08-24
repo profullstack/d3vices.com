@@ -308,9 +308,14 @@ async function buildMenu(port) {
       label: 'File',
       submenu: [
         {
-          label: 'Home',
+          label: 'Instruments',
           accelerator: 'CmdOrCtrl+H',
           click: () => mainWindow?.loadURL(`http://127.0.0.1:${port}/`),
+        },
+        {
+          label: 'This machine',
+          accelerator: 'CmdOrCtrl+M',
+          click: () => mainWindow?.loadURL(`http://127.0.0.1:${port}/machine`),
         },
         { type: 'separator' },
         process.platform === 'darwin' ? { role: 'close' } : { role: 'quit' },

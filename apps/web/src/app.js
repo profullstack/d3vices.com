@@ -5,6 +5,7 @@ import { serveStatic } from 'hono/bun';
 import { About } from './pages/About.jsx';
 import { Download } from './pages/Download.jsx';
 import { Home } from './pages/Home.jsx';
+import { Machine } from './pages/Machine.jsx';
 import { NotFound } from './pages/NotFound.jsx';
 import { Privacy } from './pages/Privacy.jsx';
 import { TestPage } from './pages/TestPage.jsx';
@@ -182,6 +183,8 @@ app.get('/', (c) => render(c, <Home />));
 app.get('/about', (c) => render(c, <About />));
 app.get('/privacy', (c) => render(c, <Privacy />));
 app.get('/download', (c) => render(c, <Download release={process.env.RELEASE_URL || ''} />));
+// Meaningful only in the desktop build; in a browser it says so and links to it.
+app.get('/machine', (c) => render(c, <Machine />));
 
 app.get('/:slug', (c) => {
   const test = TEST_BY_SLUG[c.req.param('slug')];

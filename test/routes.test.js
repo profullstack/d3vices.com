@@ -96,3 +96,19 @@ describe('network test endpoints', () => {
     expect((await res.json()).received).toBe(32768);
   });
 });
+
+describe('the machine page', () => {
+  test('renders and leaves a host for the native bridge to fill', async () => {
+    const res = await get('/machine');
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain('data-machine');
+    // It must degrade honestly in a browser rather than render an empty shell.
+    expect(html).toContain('This machine');
+  });
+
+  test('is precached, so the desktop app still opens it offline', async () => {
+    const sw = await Bun.file(`${import.meta.dir}/../apps/web/public/sw.js`).text();
+    expect(sw).toContain("'/machine'");
+  });
+});

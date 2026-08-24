@@ -1,9 +1,10 @@
 import { config, siteName } from '@d3vices/config';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
+import { RackNav } from './RackNav.jsx';
 
 const ASSET_VERSION = process.env.RAILWAY_GIT_COMMIT_SHA?.slice(0, 8) || String(Date.now());
 
-export function Layout({ title, description, path = '/', jsonLd, wide = false, children }) {
+export function Layout({ title, description, path = '/', jsonLd, wide = false, current, children }) {
   const canonical = `${config.siteUrl}${path === '/' ? '' : path}`;
   const fullTitle = path === '/' ? title : `${title} · ${siteName}`;
 
@@ -60,10 +61,23 @@ export function Layout({ title, description, path = '/', jsonLd, wide = false, c
           You are offline. Every test still works — they all run on your device.
         </div>
         <Header />
-        <main id="main" class={wide ? 'main main-wide' : 'main'}>
-          {children}
-        </main>
+        {/* The desktop build shares this markup; CSS decides what belongs to an
+            app and what belongs to a website, so there is one set of components. */}
+        <div class="app-body">
+          <RackNav current={current} class="rack-nav app-rack" />
+          <main id="main" class={wide ? 'main main-wide' : 'main'}>
+            {children}
+          </main>
+        </div>
         <Footer />
+        {/* Filled from the native bridge; stays hidden in a browser tab. */}
+        <div class="status-bar" data-status-bar hidden>
+          <span data-status-system>—</span>
+          <span data-status-cpu></span>
+          <span data-status-memory></span>
+          <span data-status-displays></span>
+          <span class="status-bar-note">NOTHING LEAVES THIS MACHINE</span>
+        </div>
         <script type="module" src={`/static/js/app.js?v=${ASSET_VERSION}`} />
       </body>
     </html>
@@ -105,7 +119,7 @@ function Header() {
         </button>
         <nav class="nav" data-nav aria-label="Tests">
           {GROUPS.map((group) => (
-            <div class="nav-group">
+            <div class="nav-group nav-web-only">
               <button class="nav-group-label" type="button">
                 {group.name}
               </button>
@@ -118,13 +132,19 @@ function Header() {
               </div>
             </div>
           ))}
-          <a class="nav-link nav-link-plain" href="/download">
+          <a class="nav-link nav-link-plain nav-web-only" href="/download">
             Desktop app
+          </a>
+          <a class="nav-link nav-desktop-only" href="/">
+            Instruments
+          </a>
+          <a class="nav-link nav-desktop-only" href="/machine">
+            This machine
           </a>
           <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle colour theme">
             <span class="theme-toggle-icon" />
           </button>
-          <button class="btn btn-primary btn-install" type="button" data-install hidden>
+          <button class="btn btn-primary btn-install nav-web-only" type="button" data-install hidden>
             Install
           </button>
         </nav>

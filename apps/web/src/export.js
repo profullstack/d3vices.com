@@ -11,7 +11,7 @@ import app from './app.js';
 
 const outDir = process.argv[2] || join(import.meta.dir, '../../../dist/site');
 
-const ROUTES = ['/', '/about', '/privacy', '/download', ...TESTS.map((t) => `/${t.slug}`)];
+const ROUTES = ['/', '/about', '/privacy', '/download', '/machine', ...TESTS.map((t) => `/${t.slug}`)];
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });

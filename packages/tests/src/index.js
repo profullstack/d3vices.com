@@ -5,6 +5,7 @@
  * file that a service worker can cache whole — a device diagnostic has to keep
  * working when the network is the thing that is broken.
  */
+import { mountMachine, mountStatusBar } from './machine.js';
 import * as ambientLight from './tests/ambient-light.js';
 import * as battery from './tests/battery.js';
 import * as bluetooth from './tests/bluetooth.js';
@@ -167,13 +168,30 @@ function initOfflineBanner() {
   update();
 }
 
+/**
+ * The desktop build serves the same pages, so the shell difference is a flag on
+ * the document root and CSS — never a second set of components to keep in sync.
+ */
+function initDesktop() {
+  if (!window.d3vices?.isDesktop) return;
+  document.documentElement.dataset.desktop = 'true';
+  mountStatusBar();
+}
+
+function mountMachinePage() {
+  const host = document.querySelector('[data-machine]');
+  if (host) mountMachine(host);
+}
+
 function boot() {
+  initDesktop();
   initTheme();
   initNav();
   initInstall();
   initOfflineBanner();
   initServiceWorker();
   mountTest();
+  mountMachinePage();
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
