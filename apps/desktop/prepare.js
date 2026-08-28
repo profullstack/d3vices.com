@@ -17,6 +17,6 @@ await cp(join(repo, 'dist/site'), join(here, 'site'), { recursive: true });
 await cp(join(repo, 'packages/tests/src/registry.js'), join(here, 'src/registry.mjs'));
 
 await mkdir(join(here, 'build'), { recursive: true });
-await cp(join(repo, 'apps/web/public/static/img/icon-512.png'), join(here, 'build/icon.png'));
+await cp(join(repo, 'apps/web/public/icons/icon-512x512.png'), join(here, 'build/icon.png'));
 
 console.log('[desktop] staged site, registry and icon');

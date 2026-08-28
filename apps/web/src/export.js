@@ -32,4 +32,14 @@ await writeFile(join(outDir, '404.html'), await notFound.text());
 
 await cp(join(import.meta.dir, '../public/static'), join(outDir, 'static'), { recursive: true });
 
+// The icon set is served from the root on the site, so the export has to place
+// it there too — otherwise every <link rel="icon"> in the exported HTML 404s.
+await cp(join(import.meta.dir, '../public/icons'), join(outDir, 'icons'), { recursive: true });
+await cp(join(import.meta.dir, '../public/icons/favicon.ico'), join(outDir, 'favicon.ico'));
+await cp(join(import.meta.dir, '../public/icons/browserconfig.xml'), join(outDir, 'browserconfig.xml'));
+
+// The manifest is a route rather than a file, so render it into the export.
+const manifest = await app.fetch(new Request('http://localhost/manifest.webmanifest'));
+await writeFile(join(outDir, 'manifest.webmanifest'), await manifest.text());
+
 console.log(`[export] ${ROUTES.length + 1} pages + static assets -> ${outDir}`);

@@ -131,10 +131,15 @@ app.get('/manifest.webmanifest', (c) => {
       theme_color: '#0b0f14',
       categories: ['utilities', 'productivity'],
       icons: [
-        { src: '/static/img/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-        { src: '/static/img/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-        { src: '/static/img/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-        { src: '/static/img/icon-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        { src: '/icons/icon-48x48.png', sizes: '48x48', type: 'image/png', purpose: 'any' },
+        { src: '/icons/icon-128x128.png', sizes: '128x128', type: 'image/png', purpose: 'any' },
+        { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: '/icons/icon-256x256.png', sizes: '256x256', type: 'image/png', purpose: 'any' },
+        { src: '/icons/icon-384x384.png', sizes: '384x384', type: 'image/png', purpose: 'any' },
+        { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+        // The "any" art is transparent with its own margin, which a mask would
+        // crop into. The maskable is opaque and inset to the safe zone instead.
+        { src: '/icons/icon-maskable-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
       ],
       // Long-press the installed icon to jump straight to the test you need.
       shortcuts: ['microphone', 'camera', 'keyboard', 'network'].map((slug) => {
@@ -175,6 +180,12 @@ app.get('/sitemap.xml', (c) => {
 // The service worker must be served from the root to control the whole scope.
 app.get('/sw.js', serveStatic({ path: './apps/web/public/sw.js' }));
 
+// A browser asks for /favicon.ico before it has parsed a single <link>, and
+// Windows only reads the tile config from the path the meta tag names.
+app.get('/favicon.ico', serveStatic({ path: './apps/web/public/icons/favicon.ico' }));
+app.get('/browserconfig.xml', serveStatic({ path: './apps/web/public/icons/browserconfig.xml' }));
+
+app.use('/icons/*', serveStatic({ root: './apps/web/public' }));
 app.use('/static/*', serveStatic({ root: './apps/web/public' }));
 
 // ---------------------------------------------------------------------- pages

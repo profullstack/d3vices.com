@@ -6,7 +6,7 @@
  * first. The only exception is the network test's own endpoints, which must
  * never be cached — a cached response would report an infinitely fast link.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `d3vices-${VERSION}`;
 
 const PRECACHE = [
@@ -17,7 +17,8 @@ const PRECACHE = [
   '/machine',
   '/static/css/style.css',
   '/static/js/app.js',
-  '/static/img/icon.svg',
+  '/icons/icon-192x192.png',
+  '/favicon.ico',
   '/manifest.webmanifest',
   // Every test page, so the whole suite survives going offline.
   '/microphone',
