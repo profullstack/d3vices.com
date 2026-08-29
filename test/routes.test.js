@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import app from '../apps/web/src/app.js';
+import { THEME_SCRIPT, THEME_SCRIPT_HASH } from '../apps/web/src/inline-scripts.js';
 import { TESTS } from '../packages/tests/src/registry.js';
 
 const get = (path, init) => app.fetch(new Request(`http://localhost${path}`, init));
@@ -81,6 +82,82 @@ describe('routes', () => {
 
   test('healthz answers for the Railway healthcheck', async () => {
     expect((await get('/healthz')).status).toBe(200);
+  });
+});
+
+describe('security headers', () => {
+  test('HSTS is set and is not asking to be preloaded', async () => {
+    const hsts = (await get('/')).headers.get('strict-transport-security') ?? '';
+    expect(hsts).toContain('max-age=31536000');
+    expect(hsts).toContain('includeSubDomains');
+    // The preload list is one-way and hard to leave; its own operator says so.
+    expect(hsts).not.toContain('preload');
+  });
+
+  test('the CSP allows the inline theme script by hash, not by unsafe-inline', async () => {
+    const csp = (await get('/')).headers.get('content-security-policy') ?? '';
+    expect(csp).toContain(THEME_SCRIPT_HASH);
+    expect(csp).not.toContain('unsafe-inline');
+    expect(csp).not.toContain('unsafe-eval');
+  });
+
+  test('the CSP admits the sources the instruments actually use', async () => {
+    const csp = (await get('/camera')).headers.get('content-security-policy') ?? '';
+    // A camera preview is a mediastream, a recording is a blob and a canvas
+    // still is a data: URL. Omit one and the test fails looking like hardware.
+    expect(csp).toContain('media-src');
+    for (const source of ['blob:', 'mediastream:', 'data:']) expect(csp).toContain(source);
+    expect(csp).toContain('https://fonts.gstatic.com');
+    expect(csp).toContain("frame-ancestors 'none'");
+  });
+
+  test('the hash in the policy matches the script the page actually serves', async () => {
+    // Two copies of that script would drift, and the page would break silently
+    // in production while every test here still passed.
+    expect(await (await get('/')).text()).toContain(THEME_SCRIPT);
+  });
+});
+
+describe('caching', () => {
+  test('html is cacheable but short-lived', async () => {
+    const cc = (await get('/')).headers.get('cache-control') ?? '';
+    expect(cc).toContain('public');
+    expect(cc).toContain('max-age=300');
+  });
+
+  test('a versioned asset is immutable and an unversioned one is not', async () => {
+    const versioned = (await get('/static/css/style.css?v=abc123')).headers.get('cache-control') ?? '';
+    expect(versioned).toContain('immutable');
+    const plain = (await get('/static/img/og.png')).headers.get('cache-control') ?? '';
+    expect(plain).not.toContain('immutable');
+  });
+
+  test('the service worker is never cached', async () => {
+    // It is how every other cached thing gets replaced. Cache it and a bad
+    // deploy has no way back out.
+    expect((await get('/sw.js')).headers.get('cache-control')).toBe('no-cache');
+  });
+
+  test('the network endpoints keep their own no-store', async () => {
+    const cc = (await get('/api/net/download?bytes=1024')).headers.get('cache-control') ?? '';
+    expect(cc).toContain('no-store');
+  });
+});
+
+describe('compression', () => {
+  const gz = (path) => get(path, { headers: { 'Accept-Encoding': 'gzip' } });
+
+  test('html and css go out compressed', async () => {
+    expect((await gz('/')).headers.get('content-encoding')).toBe('gzip');
+    expect((await gz('/static/css/style.css')).headers.get('content-encoding')).toBe('gzip');
+  });
+
+  test('the speed test payload is left alone', async () => {
+    // Compressing a throughput measurement reports a link speed the wire cannot
+    // deliver, so this response declares identity and must stay that way.
+    const res = await gz('/api/net/download?bytes=65536');
+    expect(res.headers.get('content-encoding')).toBe('identity');
+    expect((await res.arrayBuffer()).byteLength).toBe(65536);
   });
 });
 

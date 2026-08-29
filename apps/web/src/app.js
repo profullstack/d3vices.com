@@ -2,6 +2,8 @@ import { config } from '@d3vices/config';
 import { TEST_BY_SLUG, TESTS } from '@d3vices/tests/registry';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
+import { compress } from 'hono/compress';
+import { THEME_SCRIPT_HASH } from './inline-scripts.js';
 import { About } from './pages/About.jsx';
 import { Download } from './pages/Download.jsx';
 import { Home } from './pages/Home.jsx';
@@ -31,6 +33,78 @@ app.use('*', async (c, next) => {
 });
 
 /**
+ * The analytics script, when one is configured, is the only third-party origin
+ * the policy below has to make room for.
+ */
+const analyticsOrigin = (() => {
+  if (!config.analytics.src) return null;
+  try {
+    return new URL(config.analytics.src).origin;
+  } catch {
+    return null; // a same-origin path needs no extra source
+  }
+})();
+
+/**
+ * Everything the page is allowed to load, named explicitly. The tests are the
+ * awkward part: a camera preview is a `mediastream:`, a recorded clip and a
+ * captured still are `blob:`, and a canvas snapshot is a `data:` URL, so the
+ * media and image sources have to admit all three or the instrument fails with
+ * an error that reads like broken hardware.
+ *
+ * The single inline script is allowed by hash rather than by 'unsafe-inline',
+ * which is the whole point of having a policy at all.
+ */
+const CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  // The same statement as X-Frame-Options: DENY, for browsers that prefer CSP.
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  `script-src 'self' ${THEME_SCRIPT_HASH}${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
+  "style-src 'self' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob:",
+  "media-src 'self' blob: mediastream: data:",
+  `connect-src 'self'${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
+  "worker-src 'self'",
+  "manifest-src 'self'",
+].join('; ');
+
+/**
+ * Text responses went out uncompressed: 20KB of HTML and a 60KB stylesheet on
+ * every cold load. The middleware leaves the network test alone by itself — that
+ * response declares `Content-Encoding: identity`, and an already-encoded body is
+ * skipped — which matters, because compressing a throughput measurement would
+ * report a link speed the wire cannot deliver.
+ */
+app.use('*', compress());
+
+/**
+ * Nothing here sent a Cache-Control header, so every client had to guess.
+ * Assets are addressed with `?v=<commit>`, which makes a versioned URL safe to
+ * keep forever; an unversioned one is an icon or the OG image, and those get a
+ * week so a replacement is not stuck behind a year-long cache.
+ */
+const CACHE_HTML = 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
+const CACHE_IMMUTABLE = 'public, max-age=31536000, immutable';
+const CACHE_ASSET = 'public, max-age=604800';
+const CACHE_META = 'public, max-age=3600';
+
+function cacheControlFor(pathname, search) {
+  // The service worker script is how every other cached thing gets replaced. If
+  // it is itself cached, a bad deploy has no way back out.
+  if (pathname === '/sw.js') return 'no-cache';
+  if (pathname.startsWith('/api/')) return null; // those routes set their own
+  if (pathname.startsWith('/static/') || pathname.startsWith('/icons/')) {
+    return search.has('v') ? CACHE_IMMUTABLE : CACHE_ASSET;
+  }
+  if (pathname === '/favicon.ico') return CACHE_ASSET;
+  return CACHE_META;
+}
+
+/**
  * The tests read from real hardware, so the browser will only run most of them
  * on a secure origin. These headers are what let that happen without opening
  * the page up to being framed or injected into.
@@ -40,6 +114,18 @@ app.use('*', async (c, next) => {
   c.header('X-Content-Type-Options', 'nosniff');
   c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   c.header('X-Frame-Options', 'DENY');
+  // Railway terminates TLS in front of this, so every real request is already
+  // https; the header is what stops the first one of a session being plain.
+  // Deliberately not preloaded — that list is one-way and hard to leave.
+  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  c.header('Content-Security-Policy', CSP);
+
+  if (!c.res.headers.has('Cache-Control')) {
+    const { pathname, searchParams } = new URL(c.req.url);
+    const html = (c.res.headers.get('Content-Type') ?? '').startsWith('text/html');
+    const value = html ? CACHE_HTML : cacheControlFor(pathname, searchParams);
+    if (value) c.header('Cache-Control', value);
+  }
   // Self-only for everything the tests use. A permissions policy that omits an
   // API blocks it outright — the tests would fail with a name that looks like a
   // hardware fault, so every API any test touches has to be listed here.

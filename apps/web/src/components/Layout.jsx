@@ -1,5 +1,6 @@
 import { config, siteName } from '@d3vices/config';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
+import { THEME_SCRIPT } from '../inline-scripts.js';
 import { RackNav } from './RackNav.jsx';
 
 const ASSET_VERSION = process.env.RAILWAY_GIT_COMMIT_SHA?.slice(0, 8) || String(Date.now());
@@ -74,13 +75,9 @@ export function Layout({
           href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
         />
         <link rel="stylesheet" href={`/static/css/style.css?v=${ASSET_VERSION}`} />
-        {/* Set the theme before first paint so a stored light theme never flashes dark. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var t=localStorage.getItem('d3vices:theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}",
-          }}
-        />
+        {/* Set the theme before first paint so a stored light theme never flashes dark.
+            The CSP names this script by hash, so it has to be the shared constant. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         {jsonLd ? (
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         ) : null}
