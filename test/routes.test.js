@@ -6,6 +6,13 @@ import { TEST_BY_SLUG, TESTS } from '../packages/tests/src/registry.js';
 
 const get = (path, init) => app.fetch(new Request(`http://localhost${path}`, init));
 
+/** One directive out of a CSP header, so an assertion cannot match a neighbour. */
+const directive = (csp, name) =>
+  csp
+    .split(';')
+    .map((d) => d.trim())
+    .find((d) => d === name || d.startsWith(`${name} `)) ?? '';
+
 describe('routes', () => {
   test('every test in the registry has a page', async () => {
     for (const t of TESTS) {
@@ -249,6 +256,98 @@ describe('security headers', () => {
     // Two copies of that script would drift, and the page would break silently
     // in production while every test here still passed.
     expect(await (await get('/')).text()).toContain(THEME_SCRIPT);
+  });
+});
+
+describe('the ad unit', () => {
+  const frames = (html) => html.split('/api/ads/frame').length - 1;
+
+  test('a page carries one ad and no more', async () => {
+    // Impressions meter server-side at fill time, so a second unit bills a
+    // second impression for the same reader whether or not anyone saw it.
+    for (const path of ['/', '/camera', '/system']) {
+      expect(frames(await (await get(path)).text())).toBe(1);
+    }
+  });
+
+  test('it sits after the instrument, never before it', async () => {
+    // Someone who came to find out whether their microphone works should reach
+    // it without passing an ad.
+    const html = await (await get('/camera')).text();
+    expect(html.indexOf('/api/ads/frame')).toBeGreaterThan(html.indexOf('data-test="camera"'));
+  });
+
+  test('no ad on the pages that answer for the site', async () => {
+    for (const path of ['/about', '/privacy', '/download']) {
+      expect(frames(await (await get(path)).text())).toBe(0);
+    }
+  });
+
+  test('it is a cross-origin frame, not the vendor script', async () => {
+    // ad.js injects the creative as a srcdoc iframe, and a srcdoc document
+    // inherits this page's CSP — which is why using it would have cost
+    // 'unsafe-inline' in style-src and an open img-src, site-wide.
+    const html = await (await get('/')).text();
+    expect(html).toContain(`${config.ads.origin}/api/ads/frame`);
+    expect(html).not.toContain('ad.js');
+    expect(html).not.toContain('data-cp-ad');
+  });
+
+  test('it asks for the one format that is actually fluid', async () => {
+    // Every banner creative is laid out at its format's fixed pixel width, so a
+    // narrower frame clips it instead of reflowing.
+    expect(await (await get('/')).text()).toContain('format=text_link');
+  });
+
+  test('the frame is sandboxed to opening its own link and nothing else', async () => {
+    const tag = (await (await get('/')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
+    expect(tag).toContain('sandbox=');
+    expect(tag).not.toContain('allow-scripts');
+    expect(tag).not.toContain('allow-same-origin');
+    expect(tag).toContain('loading="lazy"');
+  });
+
+  test('advertising costs the policy exactly one directive', async () => {
+    const csp = (await get('/')).headers.get('content-security-policy') ?? '';
+    expect(directive(csp, 'frame-src')).toContain(config.ads.origin);
+    // And nothing anywhere else: no script, no fetch, no image, no style.
+    for (const name of ['script-src', 'connect-src', 'img-src', 'style-src', 'default-src']) {
+      expect(directive(csp, name)).not.toContain(config.ads.origin);
+    }
+  });
+
+  test('the ad did not loosen the policy it was added to', async () => {
+    const csp = (await get('/')).headers.get('content-security-policy') ?? '';
+    expect(csp).not.toContain('*');
+    expect(csp).not.toContain('unsafe-inline');
+    expect(csp).not.toContain('unsafe-eval');
+  });
+
+  test('the privacy page still describes what the site actually does', async () => {
+    // The one page that would become untrue if an ad were added quietly.
+    const html = await (await get('/privacy')).text();
+    expect(html.toLowerCase()).toContain('ad');
+  });
+
+  test('an empty slot takes the ad and its directive off the site', async () => {
+    // This is how the static export switches advertising off: the desktop app
+    // ships that output and makes no network request unless you run the network
+    // test, and an ad frame is a network request. The config reads the variable
+    // when it is imported, so this has to be a fresh process.
+    const proc = Bun.spawn(
+      [
+        'bun',
+        '-e',
+        'const a=(await import("./apps/web/src/app.js")).default;const r=await a.fetch(new Request("http://localhost/"));console.log(r.headers.get("content-security-policy"));console.log(await r.text())',
+      ],
+      { cwd: `${import.meta.dir}/..`, env: { ...process.env, ADS_SLOT: '' }, stdout: 'pipe', stderr: 'pipe' },
+    );
+    const out = await new Response(proc.stdout).text();
+    expect(await proc.exited).toBe(0);
+    expect(out).toContain('<!doctype html>');
+    expect(out).not.toContain('/api/ads/frame');
+    // No leftover rule about something the site no longer does.
+    expect(out).not.toContain('frame-src');
   });
 });
 
