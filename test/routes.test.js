@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import app from '../apps/web/src/app.js';
 import { THEME_SCRIPT, THEME_SCRIPT_HASH } from '../apps/web/src/inline-scripts.js';
 import { config } from '../packages/config/src/index.js';
-import { TESTS } from '../packages/tests/src/registry.js';
+import { TEST_BY_SLUG, TESTS } from '../packages/tests/src/registry.js';
 
 const get = (path, init) => app.fetch(new Request(`http://localhost${path}`, init));
 
@@ -83,6 +83,68 @@ describe('routes', () => {
 
   test('healthz answers for the Railway healthcheck', async () => {
     expect((await get('/healthz')).status).toBe(200);
+  });
+});
+
+describe('structured data and page content', () => {
+  const jsonLd = async (path) => {
+    const html = await (await get(path)).text();
+    return [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((m) =>
+      JSON.parse(m[1]),
+    );
+  };
+
+  test('every block of structured data is parseable', async () => {
+    // A JSON-LD block with a syntax error is ignored in silence, so the only
+    // way to know it is wrong is to parse it.
+    for (const path of ['/', '/camera', '/microphone', '/system']) {
+      expect((await jsonLd(path)).length).toBeGreaterThan(0);
+    }
+  });
+
+  test('the homepage declares an FAQ, a publisher and where to find it elsewhere', async () => {
+    const graph = (await jsonLd('/'))[0]['@graph'];
+    const byType = (type) => graph.find((n) => [n['@type']].flat().includes(type));
+    expect(byType('FAQPage').mainEntity.length).toBeGreaterThanOrEqual(4);
+    expect(byType('Organization').sameAs).toContain('https://github.com/profullstack');
+    expect(byType('WebApplication').dateModified).toBeTruthy();
+  });
+
+  test('each test page carries its own questions, not a shared block', async () => {
+    const seen = new Set();
+    for (const t of TESTS) {
+      const graph = (await jsonLd(`/${t.slug}`))[0]['@graph'];
+      const faq = graph.find((n) => n['@type'] === 'FAQPage');
+      expect(faq.mainEntity.length).toBeGreaterThanOrEqual(3);
+      for (const question of faq.mainEntity) {
+        // Two pages sharing a question would put the duplicate content back.
+        expect(seen.has(question.name)).toBe(false);
+        seen.add(question.name);
+        expect(question.acceptedAnswer.text.length).toBeGreaterThan(40);
+      }
+    }
+  });
+
+  test('the questions are in the markup, not only in the JSON-LD', async () => {
+    // Structured data that describes content the page does not contain is the
+    // one thing search engines treat as a penalty rather than a signal.
+    const html = await (await get('/camera')).text();
+    for (const { q } of TEST_BY_SLUG.camera.faq) expect(html).toContain(q);
+  });
+
+  test('the homepage meta description fits in a snippet', async () => {
+    const html = await (await get('/')).text();
+    const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
+    expect(description.length).toBeGreaterThan(50);
+    expect(description.length).toBeLessThanOrEqual(160);
+  });
+
+  test('the homepage offers a table and a list for a snippet to lift', async () => {
+    const html = await (await get('/')).text();
+    expect(html).toContain('<table');
+    expect(html).toContain('<caption>');
+    expect(html).toContain('<ul');
+    expect(html).toContain('<time datetime=');
   });
 });
 

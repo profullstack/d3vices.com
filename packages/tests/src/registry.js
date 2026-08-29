@@ -8,6 +8,8 @@
  * own `supported()`.
  */
 
+import { FAQ } from './faq.js';
+
 export const GROUPS = [
   { id: 'av', name: 'Audio & video' },
   { id: 'display', name: 'Display' },
@@ -17,7 +19,7 @@ export const GROUPS = [
   { id: 'system', name: 'System' },
 ];
 
-export const TESTS = [
+const CATALOGUE = [
   {
     id: 'microphone',
     slug: 'microphone',
@@ -367,6 +369,12 @@ export const TESTS = [
     keywords: ['browser test', 'system info', 'what browser am i using', 'gpu test'],
   },
 ];
+
+/**
+ * The questions are attached here rather than written inline, so the catalogue
+ * above stays readable at a glance and the prose lives in one file of its own.
+ */
+export const TESTS = CATALOGUE.map((test) => ({ ...test, faq: FAQ[test.id] ?? [] }));
 
 export const TEST_BY_ID = Object.fromEntries(TESTS.map((t) => [t.id, t]));
 export const TEST_BY_SLUG = Object.fromEntries(TESTS.map((t) => [t.slug, t]));

@@ -1,4 +1,4 @@
-import { config, siteName } from '@d3vices/config';
+import { buildDate, config, siteName } from '@d3vices/config';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
 import { THEME_SCRIPT } from '../inline-scripts.js';
 import { RackNav } from './RackNav.jsx';
@@ -25,6 +25,10 @@ export function Layout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <title>{fullTitle}</title>
         <meta name="description" content={description} />
+        {/* Named publisher and a build date: both are E-E-A-T signals, and the
+            date is the deploy rather than a constant that would go stale. */}
+        <meta name="author" content="Profullstack, Inc." />
+        <meta property="article:modified_time" content={buildDate} />
         {/* The 404 page is reachable at every wrong URL, so a canonical would
             point every one of them at an address that 404s in turn. */}
         {noindex ? (

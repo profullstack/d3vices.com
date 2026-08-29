@@ -1,6 +1,30 @@
-import { config } from '@d3vices/config';
+import { buildDate, config } from '@d3vices/config';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
 import { Layout } from '../components/Layout.jsx';
+
+/** Questions about the site rather than about one instrument. */
+const SITE_FAQ = [
+  {
+    q: 'Is d3vices free?',
+    a: 'Yes, and there is no paid tier to upgrade to. It is MIT licensed, there is no account to make, no trial and no card. The source is on GitHub for you to read before you grant it your camera.',
+  },
+  {
+    q: 'Does anything I test get uploaded?',
+    a: 'No. Every test runs inside the page: camera frames are drawn to a canvas in your own tab, microphone audio goes to an analyser node and is discarded, and scores are kept in local storage on your device. The one exception is the network test, which has to move bytes to measure a link, and it sends random data rather than anything of yours.',
+  },
+  {
+    q: 'Do I need to install anything?',
+    a: 'No. Every instrument runs in an ordinary browser tab. You can install it as an app if you want it offline, and there is a desktop build that reads hardware a browser is not allowed to see, but neither is required.',
+  },
+  {
+    q: 'Which browser should I use?',
+    a: 'Chromium browsers such as Chrome and Edge expose the most: Web MIDI, Web Bluetooth, the battery status and the ambient light sensor are Chromium-only. Everything else works in Firefox and Safari, and where an API is missing the test says so rather than reporting a hardware failure.',
+  },
+  {
+    q: 'Does it work offline?',
+    a: 'Yes, once installed. Every test is precached, which matters because a broken connection is one of the things you came here to diagnose. Only the network test needs the network, by definition.',
+  },
+];
 
 export function Home() {
   const jsonLd = {
@@ -10,13 +34,17 @@ export function Home() {
         '@type': 'Organization',
         '@id': `${config.siteUrl}/#organization`,
         name: 'Profullstack, Inc.',
-        url: config.siteUrl,
+        url: 'https://profullstack.com',
+        // Anchors the publisher to profiles a knowledge graph already knows,
+        // so answers can name it rather than paraphrase around it.
+        sameAs: ['https://github.com/profullstack', 'https://profullstack.com'],
       },
       {
         '@type': 'WebSite',
         '@id': `${config.siteUrl}/#website`,
         name: 'd3vices',
         url: config.siteUrl,
+        inLanguage: 'en',
         publisher: { '@id': `${config.siteUrl}/#organization` },
       },
       {
@@ -28,7 +56,19 @@ export function Home() {
         operatingSystem: 'Windows, macOS, Linux, Android, iOS',
         isAccessibleForFree: true,
         license: 'https://opensource.org/licenses/MIT',
+        dateModified: buildDate,
+        featureList: TESTS.map((t) => t.name),
+        publisher: { '@id': `${config.siteUrl}/#organization` },
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${config.siteUrl}/#faq`,
+        mainEntity: SITE_FAQ.map(({ q, a }) => ({
+          '@type': 'Question',
+          name: q,
+          acceptedAnswer: { '@type': 'Answer', text: a },
+        })),
       },
     ],
   };
@@ -36,7 +76,7 @@ export function Home() {
   return (
     <Layout
       title="d3vices — test your microphone, camera, screen, keyboard and sensors"
-      description="Free open-source hardware diagnostics. Test your mic, camera, speakers, screen sharing, display, keyboard, mouse, gamepad, sensors and network — in the browser, installed as an app, or on the desktop. Nothing is uploaded."
+      description="Free, open-source hardware diagnostics. Test your mic, camera, speakers, screen, keyboard, sensors and network in the browser. Nothing is uploaded."
       path="/"
       jsonLd={jsonLd}
     >
@@ -169,6 +209,79 @@ export function Home() {
             </li>
           </ul>
         </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>Which one do you need?</h2>
+        </div>
+        <p class="section-lede">
+          Built for anyone who has to answer "is this device actually broken" before a call starts: support
+          desks working a ticket, IT staff checking a machine before it ships, and anyone who just bought a
+          second-hand laptop and wants to know what they got.
+        </p>
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>How the three ways to run d3vices compare</caption>
+            <thead>
+              <tr>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">In the browser</th>
+                <th scope="col">Installed as an app</th>
+                <th scope="col">Desktop app</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">To install</th>
+                <td>Nothing</td>
+                <td>One click, from the browser</td>
+                <td>A download per platform</td>
+              </tr>
+              <tr>
+                <th scope="row">Works offline</th>
+                <td>After the first visit</td>
+                <td>Yes</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <th scope="row">Instruments</th>
+                <td>All {TESTS.length}</td>
+                <td>All {TESTS.length}</td>
+                <td>All {TESTS.length}, plus a machine readout</td>
+              </tr>
+              <tr>
+                <th scope="row">Reads CPU, memory and displays</th>
+                <td>What the browser exposes</td>
+                <td>What the browser exposes</td>
+                <td>The real values, from the operating system</td>
+              </tr>
+              <tr>
+                <th scope="row">Cost</th>
+                <td>Free, MIT</td>
+                <td>Free, MIT</td>
+                <td>Free, MIT</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="section-head">
+          <h2>Common questions</h2>
+        </div>
+        <dl class="faq-list">
+          {SITE_FAQ.map(({ q, a }) => (
+            <div class="faq-item">
+              <dt>{q}</dt>
+              <dd>{a}</dd>
+            </div>
+          ))}
+        </dl>
+        <p class="section-foot">
+          Last updated <time datetime={buildDate.slice(0, 10)}>{buildDate.slice(0, 10)}</time>.
+        </p>
       </section>
     </Layout>
   );

@@ -30,6 +30,21 @@ export function TestPage({ test }) {
           { '@type': 'ListItem', position: 2, name: test.name, item: `${config.siteUrl}${path}` },
         ],
       },
+      // Only where there are questions to describe. An empty FAQPage is worse
+      // than none: it claims structure the page does not have.
+      ...(test.faq.length
+        ? [
+            {
+              '@type': 'FAQPage',
+              '@id': `${config.siteUrl}${path}#faq`,
+              mainEntity: test.faq.map(({ q, a }) => ({
+                '@type': 'Question',
+                name: q,
+                acceptedAnswer: { '@type': 'Answer', text: a },
+              })),
+            },
+          ]
+        : []),
     ],
   };
 
@@ -77,6 +92,20 @@ export function TestPage({ test }) {
               <p>None. This test needs no browser permission at all.</p>
             )}
           </section>
+
+          {test.faq.length ? (
+            <section class="test-faq" id="faq">
+              <h2>Reading the result</h2>
+              <dl class="faq-list">
+                {test.faq.map(({ q, a }) => (
+                  <div class="faq-item">
+                    <dt>{q}</dt>
+                    <dd>{a}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ) : null}
 
           <section class="related">
             <h2>Nearby instruments</h2>

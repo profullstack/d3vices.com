@@ -17,3 +17,10 @@ export const config = {
 
 export const siteName = 'd3vices';
 export const siteTagline = 'Open-source hardware diagnostics that run on your device.';
+
+/**
+ * When this build went out. Captured once at start-up rather than written down,
+ * so it is the deploy date and cannot go stale between releases. Pages carry it
+ * as a freshness signal; nothing decides behaviour from it.
+ */
+export const buildDate = new Date().toISOString();
