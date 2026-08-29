@@ -19,13 +19,17 @@ import { config } from '@d3vices/config';
  * The cost of having no script is that nothing here can measure anything, and
  * that shapes both remaining choices.
  *
- * The format is one fixed size for every viewport, because picking by width
- * would need a script and rendering two units would bill two impressions for
- * one reader. It is the rectangle: 300px is the widest fixed creative that
- * still fits a 320px phone, and every creative is laid out at its format's
- * exact pixel width inside the frame, so a narrower column crops it instead of
- * reflowing it. The stylesheet handles the columns that are narrower than that
- * by letting the unit escape their padding — see `.ad-unit` there.
+ * The format is the sponsored line. Every banner creative is laid out at its
+ * format's exact pixel width inside the frame, so a column narrower than that
+ * crops it rather than reflowing it, and the rectangle that stood here before
+ * read as a box dropped into the middle of a page that is otherwise hairlines
+ * and mono. `text_link` is the one format built to fill its container: 40px
+ * tall at any width, dropping its second line under 520px, asking nothing of
+ * the column it lands in. It is also the smallest thing the slot can sell, and
+ * that trade is the point rather than an oversight. A wider banner is not
+ * available without giving up something else here — picking a size by width
+ * would need a script, and rendering two units for CSS to hide one would bill
+ * two impressions for a single reader.
  *
  * The theme is not passed at all. `/api/ads/frame` defaults to shipping both
  * palettes behind a `prefers-color-scheme` query, which the frame answers from
@@ -41,7 +45,7 @@ const SIZES = {
   text_link: [null, 40],
 };
 
-export function AdUnit({ format = 'banner_300x250' }) {
+export function AdUnit({ format = 'text_link' }) {
   const { origin, slot } = config.ads;
   // No slot configured — the desktop export, and any checkout that has not set
   // one — renders nothing at all rather than an empty box.

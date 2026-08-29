@@ -293,19 +293,22 @@ describe('the ad unit', () => {
     expect(html).not.toContain('data-cp-ad');
   });
 
-  test('it asks for one format on every viewport, and reserves that exact box', async () => {
+  test('it asks for the one format that fills its column, and pins no width', async () => {
     // Picking a size by width would need a script, and rendering two units so
-    // CSS can hide one bills two impressions for one reader. So it is one fixed
-    // format everywhere — the rectangle, 300px being the widest creative that
-    // still fits a 320px phone.
+    // CSS can hide one bills two impressions for one reader. So it is one
+    // format everywhere, and the only one that survives that is `text_link`:
+    // every banner creative is laid out at its format's exact pixel width
+    // inside the frame, so any column narrower than it crops the ad rather than
+    // reflowing it.
     //
-    // The box has to match the format: every creative is laid out at its
-    // format's exact pixel width inside the frame, so a frame of any other size
-    // crops it rather than reflowing it.
+    // The absent width is the property under test, not an omission. A width
+    // attribute here would fix the frame at a pixel size again and put back the
+    // cropping this format exists to avoid; only the 40px height is reserved,
+    // so nothing below the unit moves when the creative arrives.
     const tag = (await (await get('/')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
-    expect(tag).toContain('format=banner_300x250');
-    expect(tag).toContain('width="300"');
-    expect(tag).toContain('height="250"');
+    expect(tag).toContain('format=text_link');
+    expect(tag).not.toContain('width=');
+    expect(tag).toContain('height="40"');
   });
 
   test('it does not ask for a theme, because this end cannot know one', async () => {
