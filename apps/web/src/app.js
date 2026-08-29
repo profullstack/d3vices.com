@@ -3,6 +3,7 @@ import { TEST_BY_SLUG, TESTS } from '@d3vices/tests/registry';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { compress } from 'hono/compress';
+import { llmsFullTxt, llmsTxt, robotsTxt, securityTxt, skillMd } from './agents.js';
 import { THEME_SCRIPT_HASH } from './inline-scripts.js';
 import { About } from './pages/About.jsx';
 import { Download } from './pages/Download.jsx';
@@ -258,7 +259,16 @@ app.get('/manifest.webmanifest', (c) => {
   );
 });
 
-app.get('/robots.txt', (c) => c.text(`User-agent: *\nAllow: /\n\nSitemap: ${config.siteUrl}/sitemap.xml\n`));
+app.get('/robots.txt', (c) => c.text(robotsTxt()));
+
+/**
+ * What an answer engine or an agent reads instead of crawling 24 pages. All of
+ * it is generated from the test registry, so adding a test adds it here too.
+ */
+app.get('/llms.txt', (c) => c.text(llmsTxt()));
+app.get('/llms-full.txt', (c) => c.text(llmsFullTxt()));
+app.get('/skill.md', (c) => c.text(skillMd()));
+app.get('/.well-known/security.txt', (c) => c.text(securityTxt()));
 
 app.get('/sitemap.xml', (c) => {
   const today = new Date().toISOString().slice(0, 10);

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import app from '../apps/web/src/app.js';
 import { THEME_SCRIPT, THEME_SCRIPT_HASH } from '../apps/web/src/inline-scripts.js';
+import { config } from '../packages/config/src/index.js';
 import { TESTS } from '../packages/tests/src/registry.js';
 
 const get = (path, init) => app.fetch(new Request(`http://localhost${path}`, init));
@@ -82,6 +83,64 @@ describe('routes', () => {
 
   test('healthz answers for the Railway healthcheck', async () => {
     expect((await get('/healthz')).status).toBe(200);
+  });
+});
+
+describe('what agents and answer engines read', () => {
+  test('llms.txt lists every test, so it cannot drift from the registry', async () => {
+    const res = await get('/llms.txt');
+    expect(res.status).toBe(200);
+    const txt = await res.text();
+    expect(txt.startsWith('# d3vices')).toBe(true);
+    // The spec wants a blockquote summary and linked, described resources.
+    expect(txt).toContain('\n> ');
+    // Absolute URLs, built from the configured site URL: an answer engine that
+    // reads this file has no base to resolve a relative link against.
+    for (const t of TESTS) expect(txt).toContain(`](${config.siteUrl}/${t.slug}):`);
+    for (const path of ['/about', '/privacy', '/download']) {
+      expect(txt).toContain(`${config.siteUrl}${path}`);
+    }
+  });
+
+  test('llms-full.txt carries the long description, not just the blurb', async () => {
+    const txt = await (await get('/llms-full.txt')).text();
+    for (const t of TESTS) {
+      expect(txt).toContain(`### ${t.name}`);
+      expect(txt).toContain(t.description);
+    }
+  });
+
+  test('skill.md is honest that a test cannot be run remotely', async () => {
+    const txt = await (await get('/skill.md')).text();
+    expect(txt).toContain('cannot');
+    expect(txt).toContain('/api/net/ping');
+  });
+
+  test('security.txt has the fields RFC 9116 requires and does not expire in the past', async () => {
+    const txt = await (await get('/.well-known/security.txt')).text();
+    expect(txt).toContain('Contact:');
+    const expires = txt.match(/^Expires: (.+)$/m)?.[1];
+    expect(new Date(expires).getTime()).toBeGreaterThan(Date.now());
+  });
+
+  test('robots.txt names the AI crawlers and still points at the sitemap', async () => {
+    const txt = await (await get('/robots.txt')).text();
+    for (const bot of [
+      'GPTBot',
+      'ClaudeBot',
+      'PerplexityBot',
+      'Google-Extended',
+      'OAI-SearchBot',
+      'Applebot-Extended',
+      'CCBot',
+    ]) {
+      expect(txt).toContain(`User-agent: ${bot}`);
+    }
+    expect(txt).toContain('Sitemap:');
+    // Every group carries the same rules, so a parser that reads only the first
+    // matching group still gets the whole policy.
+    const groups = txt.split('User-agent:').length - 1;
+    expect(txt.split('Disallow: /api/').length - 1).toBe(groups);
   });
 });
 
