@@ -7,10 +7,11 @@ export function NotFound() {
       <section class="prose">
         <h1>That page does not exist</h1>
         <p>It may have been renamed. Every test is listed below.</p>
+        <h2>Every instrument</h2>
         <div class="card-grid">
           {TESTS.map((test) => (
             <a class="card" href={`/${test.slug}`}>
-              <h4>{test.name}</h4>
+              <h3>{test.name}</h3>
             </a>
           ))}
         </div>

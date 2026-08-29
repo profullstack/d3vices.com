@@ -18,9 +18,12 @@ export function Download({ release }) {
       </section>
 
       <section class="section">
+        <div class="section-head">
+          <h2>Pick your platform</h2>
+        </div>
         <div class="card-grid">
           <div class="card card-static">
-            <h4>Windows</h4>
+            <h3>Windows</h3>
             <p>Windows 10 and 11. Installer and portable build, x64 and arm64.</p>
             {release ? (
               <a class="btn btn-primary" href={`${release}`} rel="noopener noreferrer">
@@ -31,7 +34,7 @@ export function Download({ release }) {
             )}
           </div>
           <div class="card card-static">
-            <h4>macOS</h4>
+            <h3>macOS</h3>
             <p>Apple silicon and Intel, as a signed disk image.</p>
             {release ? (
               <a class="btn btn-primary" href={`${release}`} rel="noopener noreferrer">
@@ -42,7 +45,7 @@ export function Download({ release }) {
             )}
           </div>
           <div class="card card-static">
-            <h4>Linux</h4>
+            <h3>Linux</h3>
             <p>
               .deb and AppImage, x64 and arm64. Prefer the .deb on Ubuntu 24.04 and later — an AppImage cannot
               configure the Chromium sandbox from inside its own mount.

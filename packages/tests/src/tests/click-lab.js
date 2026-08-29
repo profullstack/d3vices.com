@@ -63,7 +63,7 @@ export function clickLab({ storageKey, durations, defaultDuration, showConsisten
       statGrid(...[sCps, sClicks, sLeft, sBest, sRank, sConsistency, sFastest].filter(Boolean)),
       el(
         'div.history-wrap',
-        el('h3', 'Recent runs'),
+        el('h2.test-subhead', 'Recent runs'),
         history,
         button(
           'Clear history',

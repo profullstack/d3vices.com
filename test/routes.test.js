@@ -139,6 +139,19 @@ describe('structured data and page content', () => {
     expect(description.length).toBeLessThanOrEqual(160);
   });
 
+  test('headings nest without skipping a level', async () => {
+    // A skipped level breaks the outline a screen reader navigates by, and it
+    // happened here because a smaller font was wanted, not a deeper section.
+    for (const path of ['/', '/about', '/privacy', '/download', '/camera', '/no-such-test']) {
+      const html = await (await get(path)).text();
+      const levels = [...html.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
+      expect(levels.filter((l) => l === 1).length).toBe(1);
+      for (let i = 1; i < levels.length; i++) {
+        expect(levels[i]).toBeLessThanOrEqual(levels[i - 1] + 1);
+      }
+    }
+  });
+
   test('the homepage offers a table and a list for a snippet to lift', async () => {
     const html = await (await get('/')).text();
     expect(html).toContain('<table');

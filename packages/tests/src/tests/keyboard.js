@@ -209,18 +209,24 @@ export function mount(root) {
   const showNumpad = el('input', { type: 'checkbox', checked: true });
   showNumpad.addEventListener('change', () => render());
 
+  const releaseBtn = button('Release keyboard (Esc Esc)', () => setCapture(!capturing), 'secondary');
+
   root.append(
     el(
       'div.controls',
       layoutSelect,
       el('label.checkbox', showNumpad, el('span', 'Full size (numpad)')),
       button('Reset', () => reset(), 'secondary'),
+      releaseBtn,
     ),
     st.node,
     el('div.keyboard-wrap', board, el('div.keyboard-side', nav, pad)),
     statGrid(sSeen, sLast, sCode, sKeyVal, sRollover, sRepeat, sLocks),
     note(
       'A key stays marked once it has been seen, so you can work through the whole board and spot the switch that never lit. If a key does nothing here, the browser never received it — that points at the keyboard, its firmware or the OS, not at this page.',
+    ),
+    note(
+      'This page takes over the keyboard while the test runs, which is the only way to see keys the browser would otherwise act on. Press Escape twice, or use the button above, to hand it back.',
     ),
   );
 
@@ -229,6 +235,23 @@ export function mount(root) {
   let maxDown = 0;
   const repeatTimes = [];
   let total = 0;
+
+  /**
+   * Swallowing every key is what makes this test work, and it is also a
+   * keyboard trap: without a way out, someone navigating by keyboard alone
+   * cannot Tab off this page or reach a browser shortcut. Two quick Escapes
+   * release it, which still leaves a single Escape testable.
+   */
+  let capturing = true;
+  let lastEscape = 0;
+
+  function setCapture(on) {
+    capturing = on;
+    releaseBtn.textContent = on ? 'Release keyboard (Esc Esc)' : 'Capture keyboard';
+    releaseBtn.setAttribute('aria-pressed', String(!on));
+    // Lowercase: the status dot is coloured off these exact state names.
+    st.set(on ? 'ready' : 'warn', on ? 'Press any key' : 'Keyboard released, keys go to the browser');
+  }
 
   function guessLayout() {
     const lang = navigator.language || '';
@@ -274,6 +297,15 @@ export function mount(root) {
   }
 
   function onKeyDown(e) {
+    // Two Escapes in quick succession hand the keyboard back. Checked before
+    // anything else, so it works even while every other key is being swallowed.
+    if (e.code === 'Escape') {
+      const now = performance.now();
+      if (capturing && now - lastEscape < 700) setCapture(false);
+      lastEscape = now;
+    }
+    if (!capturing) return;
+
     // The browser owns some combinations (Ctrl+W, F5). Suppressing the default
     // is what makes the test usable; it is scoped to this page only.
     if (e.code !== 'F5' && e.code !== 'F12') e.preventDefault();

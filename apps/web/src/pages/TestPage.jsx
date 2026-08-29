@@ -113,7 +113,9 @@ export function TestPage({ test }) {
               {[...related, ...others].slice(0, 6).map((t) => (
                 <a class="card" href={`/${t.slug}`}>
                   <span class="card-apis">{rackCode(t)}</span>
-                  <h4>{t.name}</h4>
+                  {/* h3, not h4: these sit under the h2 above, and a skipped
+                      level breaks the outline a screen reader navigates by. */}
+                  <h3>{t.name}</h3>
                   <p>{t.blurb}</p>
                 </a>
               ))}

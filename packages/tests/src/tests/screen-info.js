@@ -61,7 +61,7 @@ export function mount(root) {
         ),
       );
     }
-    root.append(el('h3', `All displays (${displays.length})`), list);
+    root.append(el('h2.test-subhead', `All displays (${displays.length})`), list);
   }
 
   function read() {

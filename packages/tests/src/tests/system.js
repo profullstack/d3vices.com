@@ -79,7 +79,7 @@ export function mount(root) {
     ),
     st.node,
     statGrid(...Object.values(stats)),
-    el('h3', 'Device APIs in this browser'),
+    el('h2.test-subhead', 'Device APIs in this browser'),
     matrix,
     note(
       'A red entry means this browser does not expose that API — it says nothing about whether your hardware has the feature. Safari and Firefox deliberately omit several of these, which is why a test can be unavailable on one browser and work on the next.',
