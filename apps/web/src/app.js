@@ -14,6 +14,23 @@ import { render } from './render.js';
 const app = new Hono();
 
 /**
+ * A trailing slash is a different URL to the router, so `/camera/` fell through
+ * to the 404 page while `/camera` served the test. Every such URL is a dead link
+ * for anything that appends one. Redirect instead of routing both, so each page
+ * keeps exactly one address and the canonical stays true.
+ */
+app.use('*', async (c, next) => {
+  const url = new URL(c.req.url);
+  if (url.pathname.length > 1 && url.pathname.endsWith('/')) {
+    url.pathname = url.pathname.replace(/\/+$/, '');
+    // 308 rather than 301: the network test uploads by POST, and a 301 would let
+    // a client turn that into a GET.
+    return c.redirect(url.toString(), 308);
+  }
+  return next();
+});
+
+/**
  * The tests read from real hardware, so the browser will only run most of them
  * on a secure origin. These headers are what let that happen without opening
  * the page up to being framed or injected into.

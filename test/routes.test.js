@@ -28,6 +28,32 @@ describe('routes', () => {
     expect(await res.text()).toContain('does not exist');
   });
 
+  test('a trailing slash redirects instead of 404ing', async () => {
+    // Anything that appends a slash — a crawler, a copied link, a CMS — used to
+    // get the 404 page for a page that exists.
+    for (const path of ['/camera/', '/about/', '/download/']) {
+      const res = await get(path);
+      expect(res.status).toBe(308);
+      expect(new URL(res.headers.get('location')).pathname).toBe(path.slice(0, -1));
+    }
+  });
+
+  test('the root is left alone by the slash redirect', async () => {
+    expect((await get('/')).status).toBe(200);
+  });
+
+  test('the 404 page is noindex and claims no canonical', async () => {
+    // It answers at every wrong URL, so a canonical would point all of them at
+    // /404 — which 404s in turn.
+    const html = await (await get('/no-such-test')).text();
+    expect(html).toContain('name="robots" content="noindex');
+    expect(html).not.toContain('rel="canonical"');
+  });
+
+  test('a real page still carries its canonical', async () => {
+    expect(await (await get('/camera')).text()).toContain('rel="canonical"');
+  });
+
   test('the sitemap lists every test exactly once', async () => {
     const xml = await (await get('/sitemap.xml')).text();
     for (const t of TESTS) expect(xml.split(`/${t.slug}<`).length - 1).toBe(1);

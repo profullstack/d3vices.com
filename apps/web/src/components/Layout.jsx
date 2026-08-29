@@ -4,7 +4,16 @@ import { RackNav } from './RackNav.jsx';
 
 const ASSET_VERSION = process.env.RAILWAY_GIT_COMMIT_SHA?.slice(0, 8) || String(Date.now());
 
-export function Layout({ title, description, path = '/', jsonLd, wide = false, current, children }) {
+export function Layout({
+  title,
+  description,
+  path = '/',
+  jsonLd,
+  wide = false,
+  noindex = false,
+  current,
+  children,
+}) {
   const canonical = `${config.siteUrl}${path === '/' ? '' : path}`;
   const fullTitle = path === '/' ? title : `${title} · ${siteName}`;
 
@@ -15,7 +24,13 @@ export function Layout({ title, description, path = '/', jsonLd, wide = false, c
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <title>{fullTitle}</title>
         <meta name="description" content={description} />
-        <link rel="canonical" href={canonical} />
+        {/* The 404 page is reachable at every wrong URL, so a canonical would
+            point every one of them at an address that 404s in turn. */}
+        {noindex ? (
+          <meta name="robots" content="noindex, follow" />
+        ) : (
+          <link rel="canonical" href={canonical} />
+        )}
 
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={siteName} />
