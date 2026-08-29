@@ -293,10 +293,29 @@ describe('the ad unit', () => {
     expect(html).not.toContain('data-cp-ad');
   });
 
-  test('it asks for the one format that is actually fluid', async () => {
-    // Every banner creative is laid out at its format's fixed pixel width, so a
-    // narrower frame clips it instead of reflowing.
-    expect(await (await get('/')).text()).toContain('format=text_link');
+  test('it asks for one format on every viewport, and reserves that exact box', async () => {
+    // Picking a size by width would need a script, and rendering two units so
+    // CSS can hide one bills two impressions for one reader. So it is one fixed
+    // format everywhere — the rectangle, 300px being the widest creative that
+    // still fits a 320px phone.
+    //
+    // The box has to match the format: every creative is laid out at its
+    // format's exact pixel width inside the frame, so a frame of any other size
+    // crops it rather than reflowing it.
+    const tag = (await (await get('/')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
+    expect(tag).toContain('format=banner_300x250');
+    expect(tag).toContain('width="300"');
+    expect(tag).toContain('height="250"');
+  });
+
+  test('it does not ask for a theme, because this end cannot know one', async () => {
+    // The site's theme is a stored preference the server never sees. The frame
+    // defaults to shipping both palettes behind prefers-color-scheme, which it
+    // answers from the reader's own browser — so naming one here would be us
+    // overriding a better signal with a guess.
+    const tag = (await (await get('/')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
+    expect(tag).toContain('/api/ads/frame');
+    expect(tag).not.toContain('theme=');
   });
 
   test('the frame is sandboxed to opening its own link and nothing else', async () => {
