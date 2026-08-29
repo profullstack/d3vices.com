@@ -778,17 +778,18 @@ a:hover {
 
 /* ------------------------------------------------------------------- ads */
 
-/* One sponsored line, sold through CrawlProof. Sized here rather than by an ad
-   script, so it occupies the same space before and after it loads and moves
-   nothing underneath it.
+/* One ad, sold through CrawlProof. Sized here rather than by an ad script, so
+   it occupies the same space before and after it loads and moves nothing
+   underneath it.
 
    An unsold slot answers with a blank document, and nothing on this side can
-   see that across an origin — so the unit is styled as a strip of whitespace
-   with no border, no ground and no label of its own. Empty, it reads as the gap
-   between two sections, which is where it was put. */
+   see that across an origin — so the unit carries no border and no ground of
+   its own. Empty, it is whitespace in a gap between two sections, which is
+   where it was put. */
 .ad-unit {
   display: block;
   margin: 2.6rem 0;
+  text-align: center;
 }
 .ad-unit iframe {
   display: block;
@@ -801,11 +802,21 @@ a:hover {
   width: 100%;
   height: 40px;
 }
-/* The banner creatives are laid out at a fixed pixel width inside the frame, so
-   a narrowed frame would crop one rather than reflow it. They keep their own
-   width and centre instead. */
+/* Every banner creative is laid out at its format's fixed pixel width inside
+   the frame, so a narrower frame crops it rather than reflowing it. They keep
+   their own width and centre. */
 .ad-unit:not([data-ad-format="text_link"]) iframe {
   margin-inline: auto;
+}
+/* Below this the column is narrower than the 300px rectangle — 250px on a test
+   page at 320px, which would have cut a fifth off the creative — so the unit
+   escapes the column's padding and centres against the viewport instead. The
+   ad does not get bigger; it just stops being cropped by a gutter. Safe against
+   a stray pixel because body already hides horizontal overflow. */
+@media (max-width: 640px) {
+  .ad-unit:not([data-ad-format="text_link"]) {
+    margin-inline: calc(50% - 50vw);
+  }
 }
 .ad-label {
   display: block;

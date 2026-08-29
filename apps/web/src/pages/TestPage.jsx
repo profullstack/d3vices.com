@@ -126,7 +126,7 @@ export function TestPage({ test }) {
 
           {/* Below the instrument, its permissions and its FAQ: the reading is
               done and the next thing on the page is a list of links away, so a
-              sponsored line here interrupts nothing. Never above the test — a
+              unit here interrupts nothing. Never above the test — a
               reader who came to find out whether their microphone works should
               reach it without passing an ad. */}
           <AdUnit />

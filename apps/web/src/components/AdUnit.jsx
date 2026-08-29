@@ -16,11 +16,22 @@ import { config } from '@d3vices/config';
  * mints a `crawlproof.visitor` id — writes nothing into this origin's local
  * storage. The privacy page can go on saying what it says.
  *
- * The cost of having no script is that nothing here can measure the viewport,
- * and every banner creative is laid out at a fixed pixel width inside the frame
- * (a narrowed iframe clips it rather than reflowing it). `text_link` is the one
- * format built to fill its container, so it is the default and the only one
- * that belongs in a column whose width is not known in advance.
+ * The cost of having no script is that nothing here can measure anything, and
+ * that shapes both remaining choices.
+ *
+ * The format is one fixed size for every viewport, because picking by width
+ * would need a script and rendering two units would bill two impressions for
+ * one reader. It is the rectangle: 300px is the widest fixed creative that
+ * still fits a 320px phone, and every creative is laid out at its format's
+ * exact pixel width inside the frame, so a narrower column crops it instead of
+ * reflowing it. The stylesheet handles the columns that are narrower than that
+ * by letting the unit escape their padding — see `.ad-unit` there.
+ *
+ * The theme is not passed at all. `/api/ads/frame` defaults to shipping both
+ * palettes behind a `prefers-color-scheme` query, which the frame answers from
+ * the reader's own browser — a better signal than anything this end could
+ * guess, given the site's theme is itself a stored preference the server never
+ * sees.
  */
 const SIZES = {
   banner_300x250: [300, 250],
@@ -30,7 +41,7 @@ const SIZES = {
   text_link: [null, 40],
 };
 
-export function AdUnit({ format = 'text_link' }) {
+export function AdUnit({ format = 'banner_300x250' }) {
   const { origin, slot } = config.ads;
   // No slot configured — the desktop export, and any checkout that has not set
   // one — renders nothing at all rather than an empty box.
