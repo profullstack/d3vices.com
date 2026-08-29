@@ -1,6 +1,7 @@
 import { config } from '@d3vices/config';
 import { API_DOCS } from '@d3vices/tests/api-docs';
 import { TESTS, testsInGroup } from '@d3vices/tests/registry';
+import { AdUnit } from '../components/AdUnit.jsx';
 import { Layout } from '../components/Layout.jsx';
 import { RackNav, rackCode } from '../components/RackNav.jsx';
 
@@ -122,6 +123,13 @@ export function TestPage({ test }) {
               </dl>
             </section>
           ) : null}
+
+          {/* Below the instrument, its permissions and its FAQ: the reading is
+              done and the next thing on the page is a list of links away, so a
+              sponsored line here interrupts nothing. Never above the test — a
+              reader who came to find out whether their microphone works should
+              reach it without passing an ad. */}
+          <AdUnit />
 
           <section class="related">
             <h2>Nearby instruments</h2>

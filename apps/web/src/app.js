@@ -35,7 +35,8 @@ app.use('*', async (c, next) => {
 
 /**
  * The analytics script, when one is configured, is the only third-party origin
- * the policy below has to make room for.
+ * the policy below has to make room for in `script-src`. The ad frame is the
+ * other third party, and it needs no script source at all.
  */
 const analyticsOrigin = (() => {
   if (!config.analytics.src) return null;
@@ -71,6 +72,20 @@ const CSP = [
   `connect-src 'self'${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
   "worker-src 'self'",
   "manifest-src 'self'",
+  /**
+   * Advertising costs exactly one directive, and deliberately so. The ad is a
+   * plain cross-origin document in an iframe, which carries its own policy, so
+   * nothing else here has to move. The vendor's own snippet would have needed
+   * `script-src` for its tag, `connect-src` for the fetch behind it, and then —
+   * because it injects the creative as `srcdoc`, and a srcdoc document inherits
+   * the embedder's policy — `'unsafe-inline'` in `style-src` plus a wide-open
+   * `img-src` for every page on the site. See AdUnit.jsx.
+   *
+   * Omitted rather than set to 'none' when there is no slot: `default-src`
+   * already keeps frames to this origin, and a bare 'none' would be a rule
+   * about something nothing on the site does.
+   */
+  ...(config.ads.slot ? [`frame-src ${config.ads.origin}`] : []),
 ].join('; ');
 
 /**
