@@ -6,8 +6,21 @@
  */
 import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { TESTS } from '@d3vices/tests/registry';
-import app from './app.js';
+
+// The desktop app ships this output and makes no network request unless you run
+// the network test — a promise the privacy page makes on its behalf. An ad frame
+// is a network request, so advertising is switched off here rather than left to
+// whoever runs the build.
+//
+// Everything that could reach the config is imported after the assignment, and
+// dynamically: a static import is evaluated before the first statement in this
+// file, so the config would have read the variable as it was and the desktop
+// build would have quietly shipped ads.
+process.env.ADS_SLOT = '';
+const [{ TESTS }, { default: app }] = await Promise.all([
+  import('@d3vices/tests/registry'),
+  import('./app.js'),
+]);
 
 const outDir = process.argv[2] || join(import.meta.dir, '../../../dist/site');
 

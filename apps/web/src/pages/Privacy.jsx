@@ -40,10 +40,30 @@ export function Privacy() {
 
         <h2>Third parties</h2>
         <p>
-          {config.analytics.src
-            ? 'A privacy-preserving, cookie-free analytics endpoint records page views in aggregate. It sets no cookie and does not fingerprint you.'
-            : 'None. No analytics, no advertising, no fonts or scripts loaded from anyone else’s server.'}
+          The two typefaces are loaded from Google Fonts, so fetching them tells Google that a browser at your
+          address asked for a font file. Nothing else about you goes with it.
         </p>
+        {config.analytics.src ? (
+          <p>
+            A privacy-preserving, cookie-free analytics endpoint records page views in aggregate. It sets no
+            cookie and does not fingerprint you.
+          </p>
+        ) : null}
+        {config.ads.slot ? (
+          <p>
+            There is one advertisement on some pages, sold through CrawlProof, and it is what pays for the
+            site. It is embedded the quiet way: a plain frame containing a page from their server, rather than
+            the usual advertising script. No third-party code runs on this page, no cookie is set, and nothing
+            is written to the local storage described above — an ad script would have put a permanent visitor
+            id there, and that is precisely why there is no ad script. Loading the frame tells CrawlProof what
+            any request tells a server: your IP address, your browser’s user agent, and which page the ad
+            appeared on. Which ad you get is chosen from that and nothing else. No reading any test takes is
+            available to it, or to anyone.
+          </p>
+        ) : null}
+        {!config.analytics.src && !config.ads.slot ? (
+          <p>Nothing further. No analytics and no advertising.</p>
+        ) : null}
 
         <h2>The desktop app</h2>
         <p>

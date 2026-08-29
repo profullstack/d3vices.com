@@ -13,6 +13,19 @@ export const config = {
     src: env('ANALYTICS_SRC', ''),
     siteId: env('ANALYTICS_SITE_ID', ''),
   },
+  /**
+   * The CrawlProof slot this site sells its ad inventory through. It is a
+   * public identifier, not a secret — it ships in the markup — so it is written
+   * down here rather than left to a variable somebody has to remember to set,
+   * which would make merging this a silent no-op.
+   *
+   * Set `ADS_SLOT=` (empty) to turn advertising off. The static export does
+   * exactly that, because the desktop app must make no network request.
+   */
+  ads: {
+    origin: 'https://crawlproof.com',
+    slot: env('ADS_SLOT', 'f54a21ad-3db6-4a62-a9f4-93d505c221c9'),
+  },
 };
 
 export const siteName = 'd3vices';

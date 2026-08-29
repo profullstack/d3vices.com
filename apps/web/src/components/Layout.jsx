@@ -2,7 +2,6 @@ import { buildDate, config, siteName } from '@d3vices/config';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
 import { THEME_SCRIPT } from '../inline-scripts.js';
 import { RackNav } from './RackNav.jsx';
-import Script from "next/script";
 
 const ASSET_VERSION = process.env.RAILWAY_GIT_COMMIT_SHA?.slice(0, 8) || String(Date.now());
 
@@ -116,11 +115,6 @@ export function Layout({
           <span class="status-bar-note">NOTHING LEAVES THIS MACHINE</span>
         </div>
         <script type="module" src={`/static/js/app.js?v=${ASSET_VERSION}`} />
-              <div data-cp-ad="" data-slot="f54a21ad-3db6-4a62-a9f4-93d505c221c9" data-format="banner_300x250" />
-        <div data-cp-ad="" data-slot="f54a21ad-3db6-4a62-a9f4-93d505c221c9" data-format="banner_728x90" />
-        <div data-cp-ad="" data-slot="f54a21ad-3db6-4a62-a9f4-93d505c221c9" data-format="banner_320x50" />
-        <div data-cp-ad="" data-slot="f54a21ad-3db6-4a62-a9f4-93d505c221c9" data-format="text_link" />
-        <Script src="https://crawlproof.com/ad.js" strategy="afterInteractive" />
       </body>
     </html>
   );

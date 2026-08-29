@@ -776,6 +776,47 @@ a:hover {
   margin-top: 2.2rem;
 }
 
+/* ------------------------------------------------------------------- ads */
+
+/* One sponsored line, sold through CrawlProof. Sized here rather than by an ad
+   script, so it occupies the same space before and after it loads and moves
+   nothing underneath it.
+
+   An unsold slot answers with a blank document, and nothing on this side can
+   see that across an origin — so the unit is styled as a strip of whitespace
+   with no border, no ground and no label of its own. Empty, it reads as the gap
+   between two sections, which is where it was put. */
+.ad-unit {
+  display: block;
+  margin: 2.6rem 0;
+}
+.ad-unit iframe {
+  display: block;
+  border: 0;
+  max-width: 100%;
+}
+/* The fluid format: the creative lays itself out at whatever width it is given
+   and drops its second line on a narrow one. */
+.ad-unit[data-ad-format="text_link"] iframe {
+  width: 100%;
+  height: 40px;
+}
+/* The banner creatives are laid out at a fixed pixel width inside the frame, so
+   a narrowed frame would crop one rather than reflow it. They keep their own
+   width and centre instead. */
+.ad-unit:not([data-ad-format="text_link"]) iframe {
+  margin-inline: auto;
+}
+.ad-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
 /* --------------------------------------------------------------- test page */
 
 /* Test pages run as a rack: the instrument list stays put, the bench changes. */
