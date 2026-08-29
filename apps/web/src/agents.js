@@ -1,4 +1,5 @@
 import { config, siteName, siteTagline } from '@d3vices/config';
+import { API_DOCS } from '@d3vices/tests/api-docs';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
 
 /**
@@ -69,7 +70,7 @@ export function llmsFullTxt() {
         '',
         test.description,
         '',
-        `- Browser APIs: ${test.apis.join(', ')}`,
+        `- Browser APIs: ${test.apis.map((a) => (API_DOCS[a] ? `[${a}](${API_DOCS[a]})` : a)).join(', ')}`,
         `- Permissions requested: ${test.permissions.length ? test.permissions.join(', ') : 'none'}`,
         `- Runs on: ${test.platforms.join(', ')}`,
         '',

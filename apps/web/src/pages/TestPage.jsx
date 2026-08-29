@@ -1,4 +1,5 @@
 import { config } from '@d3vices/config';
+import { API_DOCS } from '@d3vices/tests/api-docs';
 import { TESTS, testsInGroup } from '@d3vices/tests/registry';
 import { Layout } from '../components/Layout.jsx';
 import { RackNav, rackCode } from '../components/RackNav.jsx';
@@ -64,7 +65,22 @@ export function TestPage({ test }) {
           <header class="test-header">
             <p class="test-code">
               <b>{rackCode(test)}</b>
-              <span>{test.apis.join(' · ')}</span>
+              {/* Each API links to its MDN page. Naming an API is only useful
+                  if you can go and read what it is and who implements it. */}
+              <span>
+                {test.apis.map((api, i) => (
+                  <>
+                    {i ? ' · ' : ''}
+                    {API_DOCS[api] ? (
+                      <a href={API_DOCS[api]} rel="noopener noreferrer">
+                        {api}
+                      </a>
+                    ) : (
+                      api
+                    )}
+                  </>
+                ))}
+              </span>
             </p>
             <h1>{test.name}</h1>
             <p class="test-blurb">{test.description}</p>

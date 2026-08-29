@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+import { API_DOCS } from '../packages/tests/src/api-docs.js';
 import { GROUPS, TEST_BY_ID, TEST_BY_SLUG, TESTS, testsInGroup } from '../packages/tests/src/registry.js';
 
 describe('test registry', () => {
@@ -14,6 +15,18 @@ describe('test registry', () => {
 
   test('no group is empty, or it would render an empty nav menu', () => {
     for (const g of GROUPS) expect(testsInGroup(g.id).length).toBeGreaterThan(0);
+  });
+
+  test('every API a test names has somewhere to read about it', () => {
+    // The page falls back to plain text for an unknown name, so a missing link
+    // is invisible in the browser. This is what catches it.
+    for (const t of TESTS) {
+      for (const api of t.apis) expect(API_DOCS[api]).toBeTruthy();
+    }
+  });
+
+  test('every test carries questions of its own', () => {
+    for (const t of TESTS) expect(t.faq.length).toBeGreaterThanOrEqual(3);
   });
 
   test('every test carries the copy the page and the sitemap need', () => {
