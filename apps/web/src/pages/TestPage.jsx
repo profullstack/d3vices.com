@@ -4,6 +4,7 @@ import { TESTS, testsInGroup } from '@d3vices/tests/registry';
 import { AdUnit } from '../components/AdUnit.jsx';
 import { Layout } from '../components/Layout.jsx';
 import { RackNav, rackCode } from '../components/RackNav.jsx';
+import { breadcrumb } from '../schema.js';
 
 export function TestPage({ test }) {
   const path = `/${test.slug}`;
@@ -25,13 +26,7 @@ export function TestPage({ test }) {
         isAccessibleForFree: true,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'd3vices', item: config.siteUrl },
-          { '@type': 'ListItem', position: 2, name: test.name, item: `${config.siteUrl}${path}` },
-        ],
-      },
+      breadcrumb(test.name, path),
       // Only where there are questions to describe. An empty FAQPage is worse
       // than none: it claims structure the page does not have.
       ...(test.faq.length

@@ -1,4 +1,5 @@
 import { Layout } from '../components/Layout.jsx';
+import { breadcrumb } from '../schema.js';
 
 export function Machine() {
   return (
@@ -6,6 +7,7 @@ export function Machine() {
       title="This machine"
       description="Every display with its real scale factor and refresh rate, disks with free space, CPU and memory, and audio and video devices by name — the readings a browser is not allowed to take."
       path="/machine"
+      jsonLd={{ '@context': 'https://schema.org', '@graph': [breadcrumb('This machine', '/machine')] }}
       wide
     >
       <article class="test-page">

@@ -48,6 +48,7 @@ export function llmsTxt() {
     `- [Desktop app](${url('/download')}): Windows, macOS and Linux builds.`,
     `- [This machine](${url('/machine')}): Hardware readout, in the desktop build.`,
     `- [Source on GitHub](${REPO}): MIT licensed. The code that touches your devices is the code in the repository.`,
+    `- Contact: open an issue at ${REPO}/issues, or email hello@profullstack.com.`,
     `- [Full text for retrieval](${url('/llms-full.txt')}): Every page above, concatenated as Markdown.`,
     '',
   );
@@ -110,6 +111,7 @@ export function skillMd() {
     `- Read the catalogue of ${TESTS.length} tests at ${url('/llms.txt')}, or the full text at ${url('/llms-full.txt')}.`,
     '- Send a person straight to the test they need: every test is a plain URL, listed above.',
     '- Answer "how do I test my mic / camera / speakers" by linking the matching page. No sign-up stands in the way.',
+    `- Point a person at a human: hello@profullstack.com, or an issue at ${REPO}/issues.`,
     '',
     '## What an agent cannot do',
     '',
@@ -134,6 +136,7 @@ export function securityTxt() {
   expires.setUTCFullYear(expires.getUTCFullYear() + 1);
   return [
     `Contact: ${REPO}/security/advisories/new`,
+    'Contact: mailto:hello@profullstack.com',
     'Contact: https://profullstack.com',
     `Expires: ${expires.toISOString()}`,
     'Preferred-Languages: en',

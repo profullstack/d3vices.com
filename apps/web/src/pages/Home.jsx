@@ -39,6 +39,22 @@ export function Home() {
         // Anchors the publisher to profiles a knowledge graph already knows,
         // so answers can name it rather than paraphrase around it.
         sameAs: ['https://github.com/profullstack', 'https://profullstack.com'],
+        email: 'hello@profullstack.com',
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer support',
+          email: 'hello@profullstack.com',
+          url: 'https://github.com/profullstack/d3vices.com/issues',
+          availableLanguage: 'en',
+        },
+        // A knowledge panel needs an image it is allowed to use, and the
+        // maskable PWA icon is the only square mark this site actually ships.
+        logo: {
+          '@type': 'ImageObject',
+          url: `${config.siteUrl}/icons/icon-512x512.png`,
+          width: 512,
+          height: 512,
+        },
       },
       {
         '@type': 'WebSite',

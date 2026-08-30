@@ -160,6 +160,10 @@ function initServiceWorker() {
 function initOfflineBanner() {
   const banner = document.querySelector('[data-offline]');
   if (!banner) return;
+  // Written here rather than in the markup: the banner can only ever be shown
+  // by this function, so the server has no reason to ship the sentence to a
+  // crawler on every page.
+  banner.textContent = 'You are offline. Every test still works \u2014 they all run on your device.';
   const update = () => {
     banner.hidden = navigator.onLine;
   };

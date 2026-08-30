@@ -1,4 +1,5 @@
 import { Layout } from '../components/Layout.jsx';
+import { breadcrumb } from '../schema.js';
 
 export function Download({ release }) {
   return (
@@ -6,6 +7,7 @@ export function Download({ release }) {
       title="Desktop app"
       description="Download d3vices for Windows, macOS and Linux. The same open-source hardware tests, plus the readings a browser is not allowed to take."
       path="/download"
+      jsonLd={{ '@context': 'https://schema.org', '@graph': [breadcrumb('Desktop app', '/download')] }}
     >
       <section class="hero hero-compact">
         <p class="eyebrow">Windows · macOS · Linux</p>

@@ -1,5 +1,6 @@
 import { config } from '@d3vices/config';
 import { Layout } from '../components/Layout.jsx';
+import { breadcrumb } from '../schema.js';
 
 export function Privacy() {
   return (
@@ -7,6 +8,7 @@ export function Privacy() {
       title="Privacy"
       description="What d3vices collects: nothing from your devices. A plain-language privacy policy for an open-source hardware test suite."
       path="/privacy"
+      jsonLd={{ '@context': 'https://schema.org', '@graph': [breadcrumb('Privacy', '/privacy')] }}
     >
       <section class="prose">
         <h1>Privacy</h1>

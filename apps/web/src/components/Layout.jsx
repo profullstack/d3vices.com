@@ -93,9 +93,10 @@ export function Layout({
         <a class="skip-link" href="#main">
           Skip to content
         </a>
-        <div class="offline-banner" data-offline hidden>
-          You are offline. Every test still works — they all run on your device.
-        </div>
+        {/* Deliberately empty: the sentence is written by the script that
+            unhides this, so it is not the first text a crawler reads on all
+            29 pages when no reader is ever shown it there. */}
+        <div class="offline-banner" data-offline hidden />
         <Header />
         {/* The desktop build shares this markup; CSS decides what belongs to an
             app and what belongs to a website, so there is one set of components. */}
@@ -232,6 +233,7 @@ function Footer() {
           <a href="/download">Desktop app</a>
           <a href="/about">About</a>
           <a href="/privacy">Privacy</a>
+          <a href="mailto:hello@profullstack.com">Contact</a>
           <a href="https://github.com/profullstack/d3vices.com" rel="noopener noreferrer">
             GitHub
           </a>

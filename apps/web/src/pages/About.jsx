@@ -1,5 +1,6 @@
 import { TESTS } from '@d3vices/tests/registry';
 import { Layout } from '../components/Layout.jsx';
+import { breadcrumb } from '../schema.js';
 
 export function About() {
   return (
@@ -7,6 +8,7 @@ export function About() {
       title="About"
       description="d3vices is an open-source, MIT-licensed set of browser hardware diagnostics from Profullstack. No accounts, no uploads, no tracking."
       path="/about"
+      jsonLd={{ '@context': 'https://schema.org', '@graph': [breadcrumb('About d3vices', '/about')] }}
     >
       <section class="prose">
         <h1>About d3vices</h1>
@@ -53,7 +55,8 @@ export function About() {
           <a href="https://profullstack.com" rel="noopener noreferrer">
             Profullstack, Inc.
           </a>{' '}
-          Issues and pull requests are welcome on GitHub.
+          Issues and pull requests are welcome on GitHub. If you would rather not open one, write to{' '}
+          <a href="mailto:hello@profullstack.com">hello@profullstack.com</a>.
         </p>
       </section>
     </Layout>
