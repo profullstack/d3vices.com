@@ -237,6 +237,8 @@ function Footer() {
           <h3>Project</h3>
           <a href="/download">Desktop app</a>
           <a href="/about">About</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/changelog">Changelog</a>
           <a href="/privacy">Privacy</a>
           <a href="mailto:hello@profullstack.com">Contact</a>
           <a href="https://github.com/profullstack/d3vices.com" rel="noopener noreferrer">

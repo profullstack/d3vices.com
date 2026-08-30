@@ -1,6 +1,7 @@
 import { config, siteName, siteTagline } from '@d3vices/config';
 import { API_DOCS } from '@d3vices/tests/api-docs';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
+import { CHANGELOG } from './changelog.js';
 
 /**
  * The plain-text files that answer engines, LLMs and agents look for. Every one
@@ -45,6 +46,8 @@ export function llmsTxt() {
     '',
     `- [About](${url('/about')}): What it is, who builds it, and why it is open source.`,
     `- [Privacy](${url('/privacy')}): What is collected, which is nothing.`,
+    `- [Pricing](${url('/pricing')}): Free, MIT licensed. No paid tier, no trial, no account.`,
+    `- [Changelog](${url('/changelog')}): What changed and when, newest first.`,
     `- [Desktop app](${url('/download')}): Windows, macOS and Linux builds.`,
     `- [This machine](${url('/machine')}): Hardware readout, in the desktop build.`,
     `- [Source on GitHub](${REPO}): MIT licensed. The code that touches your devices is the code in the repository.`,
@@ -78,6 +81,13 @@ export function llmsFullTxt() {
       );
       for (const { q, a } of test.faq ?? []) lines.push(`**${q}**`, '', a, '');
     }
+  }
+
+  lines.push('## Changelog', '');
+  for (const entry of CHANGELOG) {
+    lines.push(`### ${entry.date} — ${entry.title}`, '');
+    for (const item of entry.items) lines.push(`- ${item}`);
+    lines.push('');
   }
 
   lines.push(

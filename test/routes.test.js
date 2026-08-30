@@ -25,7 +25,7 @@ describe('routes', () => {
   });
 
   test('every page is a real document, not a quirks-mode fragment', async () => {
-    for (const path of ['/', '/about', '/privacy', '/download', '/microphone']) {
+    for (const path of ['/', '/about', '/privacy', '/pricing', '/changelog', '/download', '/microphone']) {
       const html = await (await get(path)).text();
       expect(html.startsWith('<!doctype html>')).toBe(true);
     }
@@ -40,7 +40,7 @@ describe('routes', () => {
   test('a trailing slash redirects instead of 404ing', async () => {
     // Anything that appends a slash — a crawler, a copied link, a CMS — used to
     // get the 404 page for a page that exists.
-    for (const path of ['/camera/', '/about/', '/download/']) {
+    for (const path of ['/camera/', '/about/', '/pricing/', '/changelog/', '/download/']) {
       const res = await get(path);
       expect(res.status).toBe(308);
       expect(new URL(res.headers.get('location')).pathname).toBe(path.slice(0, -1));
@@ -149,7 +149,16 @@ describe('structured data and page content', () => {
   test('headings nest without skipping a level', async () => {
     // A skipped level breaks the outline a screen reader navigates by, and it
     // happened here because a smaller font was wanted, not a deeper section.
-    for (const path of ['/', '/about', '/privacy', '/download', '/camera', '/no-such-test']) {
+    for (const path of [
+      '/',
+      '/about',
+      '/privacy',
+      '/pricing',
+      '/changelog',
+      '/download',
+      '/camera',
+      '/no-such-test',
+    ]) {
       const html = await (await get(path)).text();
       const levels = [...html.matchAll(/<h([1-6])[\s>]/g)].map((m) => Number(m[1]));
       expect(levels.filter((l) => l === 1).length).toBe(1);
@@ -179,7 +188,7 @@ describe('what agents and answer engines read', () => {
     // Absolute URLs, built from the configured site URL: an answer engine that
     // reads this file has no base to resolve a relative link against.
     for (const t of TESTS) expect(txt).toContain(`](${config.siteUrl}/${t.slug}):`);
-    for (const path of ['/about', '/privacy', '/download']) {
+    for (const path of ['/about', '/privacy', '/pricing', '/changelog', '/download']) {
       expect(txt).toContain(`${config.siteUrl}${path}`);
     }
   });
@@ -278,7 +287,7 @@ describe('the ad unit', () => {
   });
 
   test('no ad on the pages that answer for the site', async () => {
-    for (const path of ['/about', '/privacy', '/download']) {
+    for (const path of ['/about', '/privacy', '/pricing', '/changelog', '/download']) {
       expect(frames(await (await get(path)).text())).toBe(0);
     }
   });

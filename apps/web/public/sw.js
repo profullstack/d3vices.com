@@ -13,13 +13,15 @@
  * error anywhere to say so — which is exactly how the first ad unit shipped
  * invisible. **Bump it in the same commit as any change to a precached page.**
  */
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE = `d3vices-${VERSION}`;
 
 const PRECACHE = [
   '/',
   '/about',
   '/privacy',
+  '/pricing',
+  '/changelog',
   '/download',
   '/machine',
   '/static/css/style.css',

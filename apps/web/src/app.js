@@ -6,10 +6,12 @@ import { compress } from 'hono/compress';
 import { llmsFullTxt, llmsTxt, robotsTxt, securityTxt, skillMd } from './agents.js';
 import { THEME_SCRIPT_HASH } from './inline-scripts.js';
 import { About } from './pages/About.jsx';
+import { Changelog } from './pages/Changelog.jsx';
 import { Download } from './pages/Download.jsx';
 import { Home } from './pages/Home.jsx';
 import { Machine } from './pages/Machine.jsx';
 import { NotFound } from './pages/NotFound.jsx';
+import { Pricing } from './pages/Pricing.jsx';
 import { Privacy } from './pages/Privacy.jsx';
 import { TestPage } from './pages/TestPage.jsx';
 import { render } from './render.js';
@@ -291,6 +293,8 @@ app.get('/sitemap.xml', (c) => {
     { loc: '/', priority: '1.0', freq: 'weekly' },
     ...TESTS.map((t) => ({ loc: `/${t.slug}`, priority: '0.9', freq: 'monthly' })),
     { loc: '/download', priority: '0.7', freq: 'monthly' },
+    { loc: '/pricing', priority: '0.6', freq: 'yearly' },
+    { loc: '/changelog', priority: '0.6', freq: 'weekly' },
     { loc: '/about', priority: '0.5', freq: 'yearly' },
     { loc: '/privacy', priority: '0.3', freq: 'yearly' },
   ];
@@ -321,6 +325,8 @@ app.use('/static/*', serveStatic({ root: './apps/web/public' }));
 app.get('/', (c) => render(c, <Home />));
 app.get('/about', (c) => render(c, <About />));
 app.get('/privacy', (c) => render(c, <Privacy />));
+app.get('/pricing', (c) => render(c, <Pricing />));
+app.get('/changelog', (c) => render(c, <Changelog />));
 app.get('/download', (c) => render(c, <Download release={process.env.RELEASE_URL || ''} />));
 // Meaningful only in the desktop build; in a browser it says so and links to it.
 app.get('/machine', (c) => render(c, <Machine />));
