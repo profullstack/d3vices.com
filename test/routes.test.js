@@ -330,7 +330,25 @@ describe('the ad unit', () => {
   });
 
   test('advertising costs the policy exactly one directive', async () => {
-    const csp = (await get('/')).headers.get('content-security-policy') ?? '';
+    // Measured with analytics off, because the tracker is served from the same
+    // origin as the ad frame. With both on, `script-src` naming crawlproof.com
+    // would read as the ad having grown a script source when it is the tag
+    // paying for it — and the guarantee here is about the ad alone.
+    const proc = Bun.spawn(
+      [
+        'bun',
+        '-e',
+        'const a=(await import("./apps/web/src/app.js")).default;const r=await a.fetch(new Request("http://localhost/"));console.log(r.headers.get("content-security-policy"))',
+      ],
+      {
+        cwd: `${import.meta.dir}/..`,
+        env: { ...process.env, ANALYTICS_SRC: '' },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      },
+    );
+    const csp = (await new Response(proc.stdout).text()).trim();
+    expect(await proc.exited).toBe(0);
     expect(directive(csp, 'frame-src')).toContain(config.ads.origin);
     // And nothing anywhere else: no script, no fetch, no image, no style.
     for (const name of ['script-src', 'connect-src', 'img-src', 'style-src', 'default-src']) {
@@ -370,6 +388,70 @@ describe('the ad unit', () => {
     expect(out).not.toContain('/api/ads/frame');
     // No leftover rule about something the site no longer does.
     expect(out).not.toContain('frame-src');
+  });
+});
+
+describe('the analytics tag', () => {
+  test('the tag is on the page and carries the attribute the tracker reads', async () => {
+    // CrawlProof's /stats.js looks up `script.dataset.site` and returns
+    // silently when it is missing. The tag first shipped as `data-website-id`,
+    // which loaded the script, cost the request and recorded nothing — an
+    // empty dashboard indistinguishable from having no tag at all. Assert the
+    // exact attribute rather than that a script is merely present.
+    const html = await (await get('/')).text();
+    expect(html).toContain(config.analytics.src);
+    expect(html).toContain(`data-site="${config.analytics.siteId}"`);
+    expect(html).not.toContain('data-website-id');
+  });
+
+  test('the site id is a real project id, not an empty attribute', async () => {
+    // `data-site=""` is falsy to the tracker and reports nothing, so a config
+    // that lost its default would fail exactly like no tag at all.
+    expect(config.analytics.siteId).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  test('the policy names the analytics origin in both directives it needs', async () => {
+    // The tag is one origin in `script-src` to load and the same origin in
+    // `connect-src` for the beacon behind it. Missing either is a console
+    // error on every page view and no rows in the dashboard.
+    const csp = (await get('/')).headers.get('content-security-policy') ?? '';
+    const origin = new URL(config.analytics.src).origin;
+    expect(directive(csp, 'script-src')).toContain(origin);
+    expect(directive(csp, 'connect-src')).toContain(origin);
+  });
+
+  test('analytics did not loosen the policy either', async () => {
+    const csp = (await get('/')).headers.get('content-security-policy') ?? '';
+    expect(csp).not.toContain('*');
+    expect(csp).not.toContain('unsafe-inline');
+    expect(csp).not.toContain('unsafe-eval');
+  });
+
+  test('an empty src takes the tag and its sources off the site', async () => {
+    // This is how the static export switches analytics off: the desktop app
+    // ships that output and makes no network request unless you run the
+    // network test, and a page view beacon is a network request. The config
+    // reads the variable when it is imported, so this has to be a fresh
+    // process.
+    const proc = Bun.spawn(
+      [
+        'bun',
+        '-e',
+        'const a=(await import("./apps/web/src/app.js")).default;const r=await a.fetch(new Request("http://localhost/"));console.log(r.headers.get("content-security-policy"));console.log(await r.text())',
+      ],
+      {
+        cwd: `${import.meta.dir}/..`,
+        env: { ...process.env, ANALYTICS_SRC: '' },
+        stdout: 'pipe',
+        stderr: 'pipe',
+      },
+    );
+    const out = await new Response(proc.stdout).text();
+    expect(await proc.exited).toBe(0);
+    expect(out).toContain('<!doctype html>');
+    expect(out).not.toContain('/stats.js');
+    // No leftover source for a script the site no longer loads.
+    expect(out).not.toContain('crawlproof.com/stats.js');
   });
 });
 

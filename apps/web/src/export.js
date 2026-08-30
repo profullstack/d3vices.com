@@ -9,14 +9,15 @@ import { dirname, join } from 'node:path';
 
 // The desktop app ships this output and makes no network request unless you run
 // the network test — a promise the privacy page makes on its behalf. An ad frame
-// is a network request, so advertising is switched off here rather than left to
-// whoever runs the build.
+// and an analytics tag are both network requests, so advertising and analytics
+// are switched off here rather than left to whoever runs the build.
 //
-// Everything that could reach the config is imported after the assignment, and
+// Everything that could reach the config is imported after the assignments, and
 // dynamically: a static import is evaluated before the first statement in this
-// file, so the config would have read the variable as it was and the desktop
-// build would have quietly shipped ads.
+// file, so the config would have read the variables as they were and the desktop
+// build would have quietly shipped ads and phoned home on every page.
 process.env.ADS_SLOT = '';
+process.env.ANALYTICS_SRC = '';
 const [{ TESTS }, { default: app }] = await Promise.all([
   import('@d3vices/tests/registry'),
   import('./app.js'),

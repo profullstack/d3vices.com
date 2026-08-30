@@ -85,8 +85,13 @@ export function Layout({
         {jsonLd ? (
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         ) : null}
+        {/* `data-site` is the attribute the tracker actually reads. It looks up
+            `script.dataset.site` and returns silently when it is missing, so the
+            earlier `data-website-id` would have loaded the script, cost the
+            request, and reported nothing — the same empty dashboard as having no
+            tag at all. */}
         {config.analytics.src ? (
-          <script defer src={config.analytics.src} data-website-id={config.analytics.siteId} />
+          <script defer src={config.analytics.src} data-site={config.analytics.siteId} />
         ) : null}
       </head>
       <body>
