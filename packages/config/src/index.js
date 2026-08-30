@@ -9,9 +9,20 @@ export const config = {
   siteUrl: env('SITE_URL', `http://localhost:${env('PORT', 8080)}`).replace(/\/$/, ''),
   databaseUrl: env('DATABASE_URL', ''),
   isProduction: env('NODE_ENV') === 'production',
+  /**
+   * The CrawlProof project this site reports page views to. Written down for
+   * the same reason as the ad slot below: the project id is a public
+   * identifier that ships in the markup, and leaving it to a variable somebody
+   * has to remember to set is what kept `/stats` empty from the day the
+   * project was created — the tag rendered only when `ANALYTICS_SRC` was set,
+   * it never was, so the site shipped with no analytics and said nothing.
+   *
+   * Set `ANALYTICS_SRC=` (empty) to turn analytics off. The static export does
+   * exactly that, because the desktop app must make no network request.
+   */
   analytics: {
-    src: env('ANALYTICS_SRC', ''),
-    siteId: env('ANALYTICS_SITE_ID', ''),
+    src: env('ANALYTICS_SRC', 'https://crawlproof.com/stats.js'),
+    siteId: env('ANALYTICS_SITE_ID', '11268eb9-6d51-4fee-8278-9a1fa0fec3bc'),
   },
   /**
    * The CrawlProof slot this site sells its ad inventory through. It is a
