@@ -5,8 +5,23 @@
  * browser's device APIs.
  */
 import { spawn } from 'node:child_process';
-import app from '../apps/web/src/app.js';
-import { TESTS } from '../packages/tests/src/registry.js';
+
+// This serves the real app to a real browser, so the analytics tag and the ad
+// frame both behave exactly as they do in production: the tracker posts a page
+// view, and the ad meters an impression server-side at fill time. Twenty-four
+// pages of that on every CI run is invented traffic in the live dashboard and
+// billed impressions for inventory nobody saw. This test asks whether the pages
+// mount, not whether advertising and analytics work, so it pays for neither.
+//
+// Assigned before the imports and imported dynamically, for the reason export.js
+// gives: a static import is evaluated before the first statement in the file, so
+// the config would already have read the variables as they were.
+process.env.ANALYTICS_SRC = '';
+process.env.ADS_SLOT = '';
+const [{ default: app }, { TESTS }] = await Promise.all([
+  import('../apps/web/src/app.js'),
+  import('../packages/tests/src/registry.js'),
+]);
 
 const server = Bun.serve({ port: 0, fetch: app.fetch, maxRequestBodySize: 128 * 1024 * 1024 });
 const base = `http://127.0.0.1:${server.port}`;
