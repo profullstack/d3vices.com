@@ -1,7 +1,7 @@
 import { config } from '@d3vices/config';
+import { TEST_BY_SLUG, TESTS } from '@d3vices/tests/registry';
 import { createGateway } from '@profullstack/x402-gateway';
 import { x402Gateway } from '@profullstack/x402-gateway/hono';
-import { TEST_BY_SLUG, TESTS } from '@d3vices/tests/registry';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { compress } from 'hono/compress';
