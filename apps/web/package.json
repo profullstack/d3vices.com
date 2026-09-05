@@ -8,6 +8,7 @@
   "dependencies": {
     "@d3vices/config": "workspace:*",
     "@d3vices/tests": "workspace:*",
+    "@profullstack/x402-gateway": "^0.1.0",
     "hono": "^4.9.0"
   }
 }
