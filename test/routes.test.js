@@ -230,8 +230,13 @@ describe('what agents and answer engines read', () => {
     expect(txt).toContain('Sitemap:');
     // Every group carries the same rules, so a parser that reads only the first
     // matching group still gets the whole policy.
+    // Refused training crawlers get `Disallow: /` (plus the sales page); every
+    // other group keeps `Disallow: /api/`. Together they cover every group.
     const groups = txt.split('User-agent:').length - 1;
-    expect(txt.split('Disallow: /api/').length - 1).toBe(groups);
+    const keepOut = txt.split('Disallow: /api/').length - 1;
+    const refused = txt.split('Disallow: /\n').length - 1;
+    expect(keepOut + refused).toBe(groups);
+    expect(txt).toContain('Allow: /crawl');
   });
 });
 
