@@ -1,9 +1,11 @@
 import { config } from '@d3vices/config';
+import { createGateway } from '@profullstack/x402-gateway';
+import { x402Gateway } from '@profullstack/x402-gateway/hono';
 import { TEST_BY_SLUG, TESTS } from '@d3vices/tests/registry';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { compress } from 'hono/compress';
-import { llmsFullTxt, llmsTxt, robotsTxt, securityTxt, skillMd } from './agents.js';
+import { llmsFullTxt, llmsTxt, securityTxt, skillMd } from './agents.js';
 import { THEME_SCRIPT_HASH } from './inline-scripts.js';
 import { About } from './pages/About.jsx';
 import { Changelog } from './pages/Changelog.jsx';
@@ -17,6 +19,21 @@ import { TestPage } from './pages/TestPage.jsx';
 import { render } from './render.js';
 
 const app = new Hono();
+
+/**
+ * Training crawlers (GPTBot, ClaudeBot, CCBot, meta-externalagent, Bytespider,
+ * Applebot-Extended) pay by the day over x402 (@profullstack/x402-gateway).
+ * People, search engines and retrieval crawlers pass through untouched. Without
+ * COINPAY_X402_KEY and CRAWL_PAY_TO they still get 402, with an empty offer.
+ */
+export const crawlGateway = createGateway({
+  siteUrl: config.siteUrl,
+  siteName: 'd3vices',
+  coinpay: { apiKey: process.env.COINPAY_X402_KEY },
+  payTo: process.env.CRAWL_PAY_TO,
+  contact: 'mailto:anthony@profullstack.com',
+});
+app.use('*', x402Gateway(crawlGateway));
 
 /**
  * A trailing slash is a different URL to the router, so `/camera/` fell through
@@ -276,7 +293,14 @@ app.get('/manifest.webmanifest', (c) => {
   );
 });
 
-app.get('/robots.txt', (c) => c.text(robotsTxt()));
+app.get('/robots.txt', (c) =>
+  c.text(
+    crawlGateway.robotsTxt({
+      disallow: ['/api/'],
+      comments: ['Everything here is public and MIT licensed. Training crawls are paid: see /crawl.'],
+    }),
+  ),
+);
 
 /**
  * What an answer engine or an agent reads instead of crawling 24 pages. All of
