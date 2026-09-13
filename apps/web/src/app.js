@@ -344,6 +344,11 @@ app.get('/browserconfig.xml', serveStatic({ path: './apps/web/public/icons/brows
 app.use('/icons/*', serveStatic({ root: './apps/web/public' }));
 app.use('/static/*', serveStatic({ root: './apps/web/public' }));
 
+// The OpenAccess descriptor (logicsrc.com/openaccess): hubs read it from this
+// origin to list the site; only the allowlisted static paths above are served,
+// so it needs its own route.
+app.get('/.well-known/openaccess.json', serveStatic({ path: './apps/web/public/.well-known/openaccess.json' }));
+
 // ---------------------------------------------------------------------- pages
 
 app.get('/', (c) => render(c, <Home />));
