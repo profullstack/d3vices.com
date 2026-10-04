@@ -224,6 +224,21 @@ function Footer() {
               Source on GitHub
             </a>
           </p>
+          <nav class="webring footer-oss" aria-label="Profullstack webring">
+            <a
+              href="https://rssamplifier.com/ring/profullstack/previous?from=https%3A%2F%2Fd3vices.com%2F"
+              rel="prev"
+            >
+              {'<<'}
+            </a>{' '}
+            <a href="https://rssamplifier.com/ring/profullstack">Profullstack</a>{' '}
+            <a
+              href="https://rssamplifier.com/ring/profullstack/next?from=https%3A%2F%2Fd3vices.com%2F"
+              rel="next"
+            >
+              {'>>'}
+            </a>
+          </nav>
         </div>
         {GROUPS.map((group) => (
           <div class="footer-col">
