@@ -4,6 +4,7 @@
  * bug appears that nothing in the CSS explains. Every HTML response goes
  * through here.
  */
-export function render(c, node, init) {
-  return c.html(`<!doctype html>${node.toString()}`, init);
+export async function render(c, node, init) {
+  // Awaited: the footer is an async component, so toString() can be a promise.
+  return c.html(`<!doctype html>${await node.toString()}`, init);
 }
