@@ -1,0 +1,6 @@
+{
+  "openwebring": "0.1",
+  "site": { "url": "https://d3vices.com/", "name": "d3vices" },
+  "made_by": "both",
+  "rings": [{ "ring": "https://rssamplifier.com/ring/profullstack", "slug": "d3vices-com" }]
+}
