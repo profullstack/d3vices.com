@@ -352,6 +352,13 @@ app.get(
   serveStatic({ path: './apps/web/public/.well-known/openaccess.json' }),
 );
 
+// The OpenWebring descriptor (logicsrc.com/openwebring): this site's membership
+// in the Profullstack ring.
+app.get(
+  '/.well-known/openwebring.json',
+  serveStatic({ path: './apps/web/public/.well-known/openwebring.json' }),
+);
+
 // ---------------------------------------------------------------------- pages
 
 app.get('/', (c) => render(c, <Home />));
