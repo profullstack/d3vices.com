@@ -266,6 +266,13 @@ describe('security headers', () => {
     expect(csp).toContain("frame-ancestors 'none'");
   });
 
+  test("the footer's inline style is allowed by this response's nonce", async () => {
+    const res = await get('/');
+    const nonce = (res.headers.get('content-security-policy') ?? '').match(/'nonce-([^']+)'/)?.[1];
+    expect(nonce).toBeTruthy();
+    expect(await res.text()).toContain(`<style nonce="${nonce}">`);
+  });
+
   test('the hash in the policy matches the script the page actually serves', async () => {
     // Two copies of that script would drift, and the page would break silently
     // in production while every test here still passed.

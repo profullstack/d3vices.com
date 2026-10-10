@@ -5,6 +5,7 @@ import { x402Gateway } from '@profullstack/x402-gateway/hono';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { compress } from 'hono/compress';
+import { contextStorage } from 'hono/context-storage';
 import { llmsFullTxt, llmsTxt, securityTxt, skillMd } from './agents.js';
 import { THEME_SCRIPT_HASH } from './inline-scripts.js';
 import { About } from './pages/About.jsx';
@@ -19,6 +20,9 @@ import { TestPage } from './pages/TestPage.jsx';
 import { render } from './render.js';
 
 const app = new Hono();
+
+// Lets a view read the request it renders for (the footer's CSP nonce).
+app.use(contextStorage());
 
 /**
  * Training crawlers (GPTBot, ClaudeBot, CCBot, meta-externalagent, Bytespider,
@@ -76,36 +80,40 @@ const analyticsOrigin = (() => {
  * The single inline script is allowed by hash rather than by 'unsafe-inline',
  * which is the whole point of having a policy at all.
  */
-const CSP = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "object-src 'none'",
-  // The same statement as X-Frame-Options: DENY, for browsers that prefer CSP.
-  "frame-ancestors 'none'",
-  "form-action 'self'",
-  `script-src 'self' ${THEME_SCRIPT_HASH}${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
-  "style-src 'self' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: blob:",
-  "media-src 'self' blob: mediastream: data:",
-  `connect-src 'self'${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
-  "worker-src 'self'",
-  "manifest-src 'self'",
-  /**
-   * Advertising costs exactly one directive, and deliberately so. The ad is a
-   * plain cross-origin document in an iframe, which carries its own policy, so
-   * nothing else here has to move. The vendor's own snippet would have needed
-   * `script-src` for its tag, `connect-src` for the fetch behind it, and then —
-   * because it injects the creative as `srcdoc`, and a srcdoc document inherits
-   * the embedder's policy — `'unsafe-inline'` in `style-src` plus a wide-open
-   * `img-src` for every page on the site. See AdUnit.jsx.
-   *
-   * Omitted rather than set to 'none' when there is no slot: `default-src`
-   * already keeps frames to this origin, and a bare 'none' would be a rule
-   * about something nothing on the site does.
-   */
-  ...(config.ads.slot ? [`frame-src ${config.ads.origin}`] : []),
-].join('; ');
+const cspFor = (styleNonce) =>
+  [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    // The same statement as X-Frame-Options: DENY, for browsers that prefer CSP.
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    `script-src 'self' ${THEME_SCRIPT_HASH}${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
+    // The one inline <style> is @profullstack/footer's: allowed by a per-request
+    // nonce, never 'unsafe-inline', and not a hash because its CSS comes from the
+    // package's @latest template and changes with each release.
+    `style-src 'self' https://fonts.googleapis.com${styleNonce ? ` 'nonce-${styleNonce}'` : ''}`,
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: blob:",
+    "media-src 'self' blob: mediastream: data:",
+    `connect-src 'self'${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
+    "worker-src 'self'",
+    "manifest-src 'self'",
+    /**
+     * Advertising costs exactly one directive, and deliberately so. The ad is a
+     * plain cross-origin document in an iframe, which carries its own policy, so
+     * nothing else here has to move. The vendor's own snippet would have needed
+     * `script-src` for its tag, `connect-src` for the fetch behind it, and then —
+     * because it injects the creative as `srcdoc`, and a srcdoc document inherits
+     * the embedder's policy — `'unsafe-inline'` in `style-src` plus a wide-open
+     * `img-src` for every page on the site. See AdUnit.jsx.
+     *
+     * Omitted rather than set to 'none' when there is no slot: `default-src`
+     * already keeps frames to this origin, and a bare 'none' would be a rule
+     * about something nothing on the site does.
+     */
+    ...(config.ads.slot ? [`frame-src ${config.ads.origin}`] : []),
+  ].join('; ');
 
 /**
  * Text responses went out uncompressed: 20KB of HTML and a 60KB stylesheet on
@@ -145,6 +153,10 @@ function cacheControlFor(pathname, search) {
  * the page up to being framed or injected into.
  */
 app.use('*', async (c, next) => {
+  // A fresh nonce per response for the footer's <style>; Layout reads it back
+  // through hono/context-storage.
+  const styleNonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
+  c.set('styleNonce', styleNonce);
   await next();
   c.header('X-Content-Type-Options', 'nosniff');
   c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -153,7 +165,7 @@ app.use('*', async (c, next) => {
   // https; the header is what stops the first one of a session being plain.
   // Deliberately not preloaded — that list is one-way and hard to leave.
   c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  c.header('Content-Security-Policy', CSP);
+  c.header('Content-Security-Policy', cspFor(styleNonce));
 
   if (!c.res.headers.has('Cache-Control')) {
     const { pathname, searchParams } = new URL(c.req.url);
