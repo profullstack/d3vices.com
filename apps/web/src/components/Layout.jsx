@@ -1,10 +1,36 @@
 import { buildDate, config, siteName } from '@d3vices/config';
-import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
+import { GROUPS, testsInGroup } from '@d3vices/tests/registry';
+import { footerHtml } from '@profullstack/footer';
 import { getContext } from 'hono/context-storage';
 import { raw } from 'hono/html';
 import { THEME_SCRIPT } from '../inline-scripts.js';
 import { pitFooterHtml } from '../pit-footer.js';
 import { RackNav } from './RackNav.jsx';
+
+/** @profullstack/footer (links, copyright, webring) with this response's CSP nonce. */
+async function ProfullstackFooter() {
+  let nonce;
+  try {
+    nonce = getContext().get('styleNonce');
+  } catch {
+    nonce = undefined;
+  }
+  return raw(
+    await footerHtml({
+      site: 'https://d3vices.com/',
+      nonce,
+      links: [
+        { label: 'Desktop app', href: '/download' },
+        { label: 'About', href: '/about' },
+        { label: 'Pricing', href: '/pricing' },
+        { label: 'Changelog', href: '/changelog' },
+        { label: 'Privacy', href: '/privacy' },
+        { label: 'Contact', href: 'mailto:hello@profullstack.com' },
+        { label: 'Source', href: 'https://github.com/profullstack/d3vices.com', rel: 'noopener noreferrer' },
+      ],
+    }),
+  );
+}
 
 /** The pit.world network footer with this response's CSP nonce (none outside a request). */
 async function PitFooter() {
@@ -210,25 +236,7 @@ function Header() {
   );
 }
 
+/** The site footer is the @profullstack/footer row: links, copyright and the webring. */
 function Footer() {
-  return (
-    <footer class="footer">
-      <div class="footer-inner">
-        <nav class="footer-links" aria-label="Footer">
-          <a href="/download">Desktop app</a>
-          <a href="/about">About</a>
-          <a href="/pricing">Pricing</a>
-          <a href="/changelog">Changelog</a>
-          <a href="/privacy">Privacy</a>
-          <a href="mailto:hello@profullstack.com">Contact</a>
-          <a href="https://github.com/profullstack/d3vices.com" rel="noopener noreferrer">
-            Source
-          </a>
-        </nav>
-        <p class="footer-copy">
-          © {new Date().getFullYear()} Profullstack, Inc. · MIT licensed · Every test runs on your device.
-        </p>
-      </div>
-    </footer>
-  );
+  return <ProfullstackFooter />;
 }
