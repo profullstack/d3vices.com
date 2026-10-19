@@ -266,11 +266,15 @@ describe('security headers', () => {
     expect(csp).toContain("frame-ancestors 'none'");
   });
 
-  test("the footer's inline style is allowed by this response's nonce", async () => {
+  test("the network footer's inline style is allowed by this response's nonce", async () => {
     const res = await get('/');
     const nonce = (res.headers.get('content-security-policy') ?? '').match(/'nonce-([^']+)'/)?.[1];
     expect(nonce).toBeTruthy();
-    expect(await res.text()).toContain(`<style nonce="${nonce}">`);
+    const html = await res.text();
+    // The pit.world footer is fetched over the network and renders nothing when
+    // it cannot be reached; when it is there, its <style> carries the nonce.
+    if (html.includes('data-pit-footer')) expect(html).toContain(`<style nonce="${nonce}">`);
+    expect(html).not.toMatch(/<style>/);
   });
 
   test('the hash in the policy matches the script the page actually serves', async () => {

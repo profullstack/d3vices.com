@@ -1,6 +1,6 @@
 {
   "name": "d3vices.com",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Open-source browser hardware diagnostics. Test your mic, camera, screen, keyboard, sensors and inputs — in the browser, as an installable PWA, or as a native desktop app.",
