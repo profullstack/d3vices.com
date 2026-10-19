@@ -1,26 +1,20 @@
 import { buildDate, config, siteName } from '@d3vices/config';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
-import { footerHtml } from '@profullstack/footer';
 import { getContext } from 'hono/context-storage';
 import { raw } from 'hono/html';
 import { THEME_SCRIPT } from '../inline-scripts.js';
+import { pitFooterHtml } from '../pit-footer.js';
 import { RackNav } from './RackNav.jsx';
 
-/** @profullstack/footer with this response's CSP nonce (none outside a request). */
-async function ProfullstackFooter() {
+/** The pit.world network footer with this response's CSP nonce (none outside a request). */
+async function PitFooter() {
   let nonce;
   try {
     nonce = getContext().get('styleNonce');
   } catch {
     nonce = undefined;
   }
-  return raw(
-    await footerHtml({
-      site: 'https://d3vices.com/',
-      nonce,
-      tagline: `${TESTS.length} instruments · no sign-up · no tracking`,
-    }),
-  );
+  return raw(await pitFooterHtml(nonce));
 }
 
 const ASSET_VERSION = process.env.RAILWAY_GIT_COMMIT_SHA?.slice(0, 8) || String(Date.now());
@@ -141,6 +135,7 @@ export function Layout({
           <span class="status-bar-note">NOTHING LEAVES THIS MACHINE</span>
         </div>
         <script type="module" src={`/static/js/app.js?v=${ASSET_VERSION}`} />
+        <PitFooter />
       </body>
     </html>
   );
@@ -217,60 +212,23 @@ function Header() {
 
 function Footer() {
   return (
-    <>
-      <footer class="footer">
-        <div class="footer-inner">
-          <div class="footer-brand">
-            <span class="brand-mark" aria-hidden="true">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M2 12h4l2.5-6 4 12 3-8 2 2H22" />
-              </svg>
-            </span>
-            <p>
-              Every test runs on your device. Nothing you test is uploaded, and there is no account to make.
-            </p>
-            <p class="footer-oss">
-              MIT licensed ·{' '}
-              <a href="https://github.com/profullstack/d3vices.com" rel="noopener noreferrer">
-                Source on GitHub
-              </a>
-            </p>
-          </div>
-          {GROUPS.map((group) => (
-            <div class="footer-col">
-              <h3>{group.name}</h3>
-              {testsInGroup(group.id).map((test) => (
-                <a href={`/${test.slug}`}>{test.short}</a>
-              ))}
-            </div>
-          ))}
-          <div class="footer-col">
-            <h3>Project</h3>
-            <a href="/download">Desktop app</a>
-            <a href="/about">About</a>
-            <a href="/pricing">Pricing</a>
-            <a href="/changelog">Changelog</a>
-            <a href="/privacy">Privacy</a>
-            <a href="mailto:hello@profullstack.com">Contact</a>
-            <a href="https://github.com/profullstack/d3vices.com" rel="noopener noreferrer">
-              GitHub
-            </a>
-          </div>
-        </div>
-      </footer>
-      {/* The bottom bar: @profullstack/footer, the same copyright line and
-        webring every Profullstack site carries, rendered per request. */}
-      <ProfullstackFooter />
-    </>
+    <footer class="footer">
+      <div class="footer-inner">
+        <nav class="footer-links" aria-label="Footer">
+          <a href="/download">Desktop app</a>
+          <a href="/about">About</a>
+          <a href="/pricing">Pricing</a>
+          <a href="/changelog">Changelog</a>
+          <a href="/privacy">Privacy</a>
+          <a href="mailto:hello@profullstack.com">Contact</a>
+          <a href="https://github.com/profullstack/d3vices.com" rel="noopener noreferrer">
+            Source
+          </a>
+        </nav>
+        <p class="footer-copy">
+          © {new Date().getFullYear()} Profullstack, Inc. · MIT licensed · Every test runs on your device.
+        </p>
+      </div>
+    </footer>
   );
 }

@@ -89,9 +89,9 @@ const cspFor = (styleNonce) =>
     "frame-ancestors 'none'",
     "form-action 'self'",
     `script-src 'self' ${THEME_SCRIPT_HASH}${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
-    // The one inline <style> is @profullstack/footer's: allowed by a per-request
+    // The one inline <style> is the pit.world footer's: allowed by a per-request
     // nonce, never 'unsafe-inline', and not a hash because its CSS comes from the
-    // package's @latest template and changes with each release.
+    // pit.world and changes without a deploy here.
     `style-src 'self' https://fonts.googleapis.com${styleNonce ? ` 'nonce-${styleNonce}'` : ''}`,
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob:",
