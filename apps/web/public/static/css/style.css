@@ -733,7 +733,7 @@ a:hover {
    where it was put. */
 .ad-unit {
   display: block;
-  margin: 2.6rem 0;
+  margin: 0.6rem 0;
   text-align: center;
 }
 .ad-unit iframe {
