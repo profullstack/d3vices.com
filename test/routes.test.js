@@ -290,7 +290,7 @@ describe('the ad unit', () => {
   test('a page carries one ad and no more', async () => {
     // Impressions meter server-side at fill time, so a second unit bills a
     // second impression for the same reader whether or not anyone saw it.
-    for (const path of ['/', '/camera', '/system']) {
+    for (const path of ['/camera', '/system']) {
       expect(frames(await (await get(path)).text())).toBe(1);
     }
   });
@@ -302,8 +302,8 @@ describe('the ad unit', () => {
     expect(html.indexOf('/api/ads/frame')).toBeGreaterThan(html.indexOf('data-test="camera"'));
   });
 
-  test('no ad on the pages that answer for the site', async () => {
-    for (const path of ['/about', '/privacy', '/pricing', '/changelog', '/download']) {
+  test('no ad on the homepage or the pages that answer for the site', async () => {
+    for (const path of ['/', '/about', '/privacy', '/pricing', '/changelog', '/download']) {
       expect(frames(await (await get(path)).text())).toBe(0);
     }
   });
@@ -312,7 +312,7 @@ describe('the ad unit', () => {
     // ad.js injects the creative as a srcdoc iframe, and a srcdoc document
     // inherits this page's CSP — which is why using it would have cost
     // 'unsafe-inline' in style-src and an open img-src, site-wide.
-    const html = await (await get('/')).text();
+    const html = await (await get('/camera')).text();
     expect(html).toContain(`${config.ads.origin}/api/ads/frame`);
     expect(html).not.toContain('ad.js');
     expect(html).not.toContain('data-cp-ad');
@@ -330,7 +330,7 @@ describe('the ad unit', () => {
     // attribute here would fix the frame at a pixel size again and put back the
     // cropping this format exists to avoid; only the 40px height is reserved,
     // so nothing below the unit moves when the creative arrives.
-    const tag = (await (await get('/')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
+    const tag = (await (await get('/camera')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
     expect(tag).toContain('format=text_link');
     expect(tag).not.toContain('width=');
     expect(tag).toContain('height="40"');
@@ -341,13 +341,13 @@ describe('the ad unit', () => {
     // defaults to shipping both palettes behind prefers-color-scheme, which it
     // answers from the reader's own browser — so naming one here would be us
     // overriding a better signal with a guess.
-    const tag = (await (await get('/')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
+    const tag = (await (await get('/camera')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
     expect(tag).toContain('/api/ads/frame');
     expect(tag).not.toContain('theme=');
   });
 
   test('the frame is sandboxed to opening its own link and nothing else', async () => {
-    const tag = (await (await get('/')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
+    const tag = (await (await get('/camera')).text()).match(/<iframe[^>]*>/)?.[0] ?? '';
     expect(tag).toContain('sandbox=');
     expect(tag).not.toContain('allow-scripts');
     expect(tag).not.toContain('allow-same-origin');
@@ -382,7 +382,7 @@ describe('the ad unit', () => {
   });
 
   test('the ad did not loosen the policy it was added to', async () => {
-    const csp = (await get('/')).headers.get('content-security-policy') ?? '';
+    const csp = (await get('/camera')).headers.get('content-security-policy') ?? '';
     expect(csp).not.toContain('*');
     expect(csp).not.toContain('unsafe-inline');
     expect(csp).not.toContain('unsafe-eval');

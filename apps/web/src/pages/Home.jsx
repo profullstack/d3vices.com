@@ -1,6 +1,5 @@
 import { buildDate, config } from '@d3vices/config';
 import { GROUPS, TESTS, testsInGroup } from '@d3vices/tests/registry';
-import { AdUnit } from '../components/AdUnit.jsx';
 import { Layout } from '../components/Layout.jsx';
 
 /** Questions about the site rather than about one instrument. */
@@ -196,11 +195,7 @@ export function Home() {
         ))}
       </section>
 
-      {/* After the rack, not before it. Whoever came here to test something has
-          already been handed the whole list; this sits in the seam between the
-          instruments and the copy about them, where a section break was going
-          to be anyway. */}
-      <AdUnit />
+      {/* The homepage carries no ad unit. */}
 
       <section class="section section-split">
         <div>
