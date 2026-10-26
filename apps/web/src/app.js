@@ -94,7 +94,8 @@ const cspFor = (styleNonce) =>
     // outside this repo and changes without a deploy here.
     `style-src 'self' https://fonts.googleapis.com${styleNonce ? ` 'nonce-${styleNonce}'` : ''}`,
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: blob:",
+    // The shared footer's built.indie and pwamart badges, by name (never an open img-src).
+    "img-src 'self' data: blob: https://built.indie.pit.world https://pwamart.com",
     "media-src 'self' blob: mediastream: data:",
     `connect-src 'self'${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
     "worker-src 'self'",
