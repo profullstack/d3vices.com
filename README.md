@@ -26,14 +26,14 @@ one of the things you came here to diagnose.
 
 24 tests, grouped:
 
-| Group | Tests |
-| --- | --- |
-| Audio & video | microphone, speaker, camera, screen share |
-| Display | display & dead pixel, screen information |
-| Input | keyboard, mouse, touch, gamepad, MIDI |
-| Performance lab | click speed (CPS), Kohi, jitter, reaction time, scroll speed |
+| Group            | Tests                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| Audio & video    | microphone, speaker, camera, screen share                               |
+| Display          | display & dead pixel, screen information                                |
+| Input            | keyboard, mouse, touch, gamepad, MIDI                                   |
+| Performance lab  | click speed (CPS), Kohi, jitter, reaction time, scroll speed            |
 | Sensors & radios | network, battery, location, motion, ambient light, vibration, Bluetooth |
-| System | full capability report |
+| System           | full capability report                                                  |
 
 ## Stack
 
@@ -119,7 +119,7 @@ website, never the app.
 
 `electron-builder`'s stock `.deb` postinst decides how to configure the Chromium
 sandbox by running `unshare --user true` **as root**, during install. On Ubuntu
-24.04+ `kernel.apparmor_restrict_unprivileged_userns=1` restricts *unprivileged*
+24.04+ `kernel.apparmor_restrict_unprivileged_userns=1` restricts _unprivileged_
 user namespaces only, and root is exempt — so the probe succeeds, the SUID
 helper is left non-SUID, and the app aborts for the ordinary user who launches
 it. `apps/desktop/resources/after-install.sh` probes as `nobody` instead and
