@@ -9,7 +9,7 @@ desktop app for Windows, macOS and Linux.
 bytes that reach the server are the page itself and the network test, which
 exists precisely to move bytes.
 
-- Live: <https://d3vices.com>
+- Live: <https://d3vices.pwa.pit.world>
 - Licence: MIT
 
 ## Why

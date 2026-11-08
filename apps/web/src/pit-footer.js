@@ -4,7 +4,7 @@
  * serves the last good copy; with no copy at all it renders nothing, so the page
  * never depends on pit.world being up.
  */
-const URL_ = 'https://pit.world/snippets/footer.html?site=d3vices.com';
+const URL_ = 'https://pit.world/snippets/footer.html?site=d3vices.pwa.pit.world';
 const TTL_MS = 60 * 60 * 1000;
 
 let cache = { html: '', fetchedAt: 0 };

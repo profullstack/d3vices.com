@@ -1,9 +1,9 @@
 {
   "openaccess": "0.1",
   "name": "d3vices",
-  "url": "https://d3vices.com",
+  "url": "https://d3vices.pwa.pit.world",
   "operator": "https://logicsrc.com/.well-known/openprofile.md",
-  "redirect_uris": ["https://d3vices.com/api/v1/openaccess/callback"],
+  "redirect_uris": ["https://d3vices.pwa.pit.world/api/v1/openaccess/callback"],
   "jwks": {
     "keys": [
       {
@@ -18,6 +18,6 @@
   },
   "scopes": {},
   "honours": ["profullstack.com/all-access"],
-  "webhooks": "https://d3vices.com/api/v1/openaccess/events",
+  "webhooks": "https://d3vices.pwa.pit.world/api/v1/openaccess/events",
   "hubs": ["https://openaccess.logicsrc.com"]
 }

@@ -328,7 +328,7 @@ async function buildMenu(port) {
     {
       role: 'help',
       submenu: [
-        { label: 'd3vices.com', click: () => shell.openExternal('https://d3vices.com') },
+        { label: 'd3vices.com', click: () => shell.openExternal('https://d3vices.pwa.pit.world') },
         {
           label: 'Source on GitHub',
           click: () => shell.openExternal('https://github.com/profullstack/d3vices.com'),
