@@ -17,7 +17,7 @@ async function ProfullstackFooter() {
   }
   return raw(
     await footerHtml({
-      site: 'https://d3vices.com/',
+      site: 'https://d3vices.pwa.pit.world/',
       nonce,
       links: [
         { label: 'Desktop app', href: '/download' },

@@ -14,5 +14,5 @@ contextBridge.exposeInMainWorld('d3vices', {
   openExternal: (url) => ipcRenderer.invoke('d3vices:open-external', url),
   // The network test must measure a real link, not the loopback server the app
   // is served from, so on the desktop it is pointed at the public endpoints.
-  netBase: 'https://d3vices.com',
+  netBase: 'https://d3vices.pwa.pit.world',
 });

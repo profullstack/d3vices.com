@@ -6,7 +6,7 @@
   "description": "Open-source hardware diagnostics for Windows, macOS and Linux.",
   "license": "MIT",
   "author": "Profullstack, Inc. <hello@profullstack.com>",
-  "homepage": "https://d3vices.com",
+  "homepage": "https://d3vices.pwa.pit.world",
   "main": "src/main.js",
   "scripts": {
     "prepare:app": "bun prepare.js",
