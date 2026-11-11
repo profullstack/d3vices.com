@@ -89,7 +89,7 @@ const cspFor = (styleNonce) =>
     "frame-ancestors 'none'",
     // The shared footer's newsletter form posts to pit.world (double opt-in, keeps this site's host).
     "form-action 'self' https://pit.world",
-    `script-src 'self' ${THEME_SCRIPT_HASH}${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
+    `script-src 'self' https://cdn.jsdelivr.net ${THEME_SCRIPT_HASH}${analyticsOrigin ? ` ${analyticsOrigin}` : ''}`,
     // The inline <style>s (@profullstack/footer and pit.world): allowed by a per-request
     // nonce, never 'unsafe-inline', and not a hash because their CSS comes from
     // outside this repo and changes without a deploy here.

@@ -133,6 +133,13 @@ export function Layout({
         {config.analytics.src ? (
           <script defer src={config.analytics.src} data-site={config.analytics.siteId} />
         ) : null}
+        {/* WebMCP (@profullstack/webmcp): site_info and open_page (the device tests) for the AI agent in the visitor's browser. */}
+        <script
+          type="module"
+          data-webmcp=""
+          src="https://cdn.jsdelivr.net/npm/@profullstack/webmcp@0/src/embed.js"
+          data-pages={JSON.stringify({ microphone: '/microphone', speaker: '/speaker', camera: '/camera', keyboard: '/keyboard', mouse: '/mouse', display: '/display', network: '/network', gamepad: '/gamepad' })}
+        />
       </head>
       <body>
         <a class="skip-link" href="#main">
