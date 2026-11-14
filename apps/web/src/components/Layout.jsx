@@ -138,7 +138,16 @@ export function Layout({
           type="module"
           data-webmcp=""
           src="https://cdn.jsdelivr.net/npm/@profullstack/webmcp@0/src/embed.js"
-          data-pages={JSON.stringify({ microphone: '/microphone', speaker: '/speaker', camera: '/camera', keyboard: '/keyboard', mouse: '/mouse', display: '/display', network: '/network', gamepad: '/gamepad' })}
+          data-pages={JSON.stringify({
+            microphone: '/microphone',
+            speaker: '/speaker',
+            camera: '/camera',
+            keyboard: '/keyboard',
+            mouse: '/mouse',
+            display: '/display',
+            network: '/network',
+            gamepad: '/gamepad',
+          })}
         />
       </head>
       <body>
